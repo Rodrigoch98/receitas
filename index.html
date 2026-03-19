@@ -3,1753 +3,880 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ReceitaPro — Gestão de Receitas & Precificação</title>
+<title>ReceitaPro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Firebase SDK -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Satoshi:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-
 <style>
-/* ═══════════════════════════════════════════════════════════
-   DESIGN SYSTEM — Warm Luxury Kitchen
-   ═══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   DESIGN: "Warm Patisserie" — Light, Airy, Professional
+   ══════════════════════════════════════════════════════ */
 :root {
-  /* Warm palette */
-  --bg-deep: #110F0D;
-  --bg: #1A1714;
-  --bg-card: #231F1B;
-  --bg-card-alt: #2A2520;
-  --bg-elevated: #302B25;
-  --bg-input: #1A1714;
-  --bg-hover: #332D27;
-  --border: #3D362E;
-  --border-light: #4A4239;
-  --border-focus: #D4A054;
+  --white: #FFFFFF;
+  --bg: #F8F6F3;
+  --bg-warm: #F3EDE6;
+  --bg-card: #FFFFFF;
+  --bg-input: #F8F6F3;
+  --bg-hover: #F0EBE3;
+  --border: #E8E0D6;
+  --border-light: #F0EBE4;
+  --border-focus: #C47D3C;
+  --shadow-sm: 0 1px 3px rgba(120,90,50,0.06), 0 1px 2px rgba(120,90,50,0.04);
+  --shadow: 0 4px 16px rgba(120,90,50,0.07), 0 2px 4px rgba(120,90,50,0.04);
+  --shadow-lg: 0 12px 40px rgba(120,90,50,0.1), 0 4px 12px rgba(120,90,50,0.06);
+  --shadow-xl: 0 20px 60px rgba(120,90,50,0.12);
 
-  /* Text */
-  --text: #F5F0EB;
-  --text-secondary: #C4B8AA;
-  --text-muted: #8C8078;
-  --text-dim: #5E554D;
+  --text: #2C2418;
+  --text-secondary: #6B5D4F;
+  --text-muted: #9C8E7E;
+  --text-light: #BEB3A5;
 
-  /* Accent — warm copper/gold */
-  --accent: #D4A054;
-  --accent-light: #E8C07A;
-  --accent-dark: #B8862E;
-  --accent-glow: rgba(212,160,84,0.15);
-  --accent-glow-strong: rgba(212,160,84,0.25);
+  --accent: #C47D3C;
+  --accent-hover: #A8672E;
+  --accent-light: #F2E4D4;
+  --accent-lighter: #FBF5EE;
+  --accent-text: #8B5A1B;
 
-  /* Status */
-  --success: #7CB87C;
-  --success-bg: rgba(124,184,124,0.1);
-  --danger: #D47070;
-  --danger-bg: rgba(212,112,112,0.1);
-  --info: #70A8D4;
-  --info-bg: rgba(112,168,212,0.1);
-  --warning: #D4A854;
-  --warning-bg: rgba(212,168,84,0.1);
+  --green: #4A9A6B;
+  --green-bg: #EBF5EE;
+  --red: #C45C5C;
+  --red-bg: #FBEEEE;
+  --blue: #4A7EC4;
+  --blue-bg: #EEF3FB;
 
-  /* Category colors */
-  --cat-doces: #D4A054;
-  --cat-salgados: #D47070;
-  --cat-bolos: #B87CD4;
-  --cat-paes: #D4A870;
-  --cat-tortas: #70B8A8;
-  --cat-bebidas: #70A8D4;
-  --cat-outros: #8C8078;
+  --cat-doces: #C47D3C;
+  --cat-salgados: #C45C5C;
+  --cat-bolos: #8B6AAE;
+  --cat-paes: #B8863C;
+  --cat-tortas: #4A9A7E;
+  --cat-bebidas: #4A7EC4;
+  --cat-outros: #9C8E7E;
 
-  /* Sizing */
   --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
 
-  /* Fonts */
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Outfit', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Satoshi', system-ui, sans-serif;
 
-  /* Layout */
-  --nav-h: 60px;
-  --bottom-nav-h: 72px;
-  --sidebar-w: 260px;
-  --max-w: 860px;
+  --nav-h: 64px;
+  --bnav-h: 68px;
 }
 
-/* ─── RESET ─── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { font-size: 16px; scroll-behavior: smooth; }
 body {
-  font-family: var(--font-sans);
-  background: var(--bg-deep);
+  font-family: var(--font-body);
+  background: var(--bg);
   color: var(--text);
   min-height: 100dvh;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-button { font-family: var(--font-sans); }
-input, select, textarea { font-family: var(--font-sans); }
-
-/* ─── SUBTLE TEXTURE OVERLAY ─── */
-body::before {
-  content: '';
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
+  overflow-x: hidden;
 }
 
-/* ─── SCROLLBAR ─── */
-::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
 /* ═══ HEADER ═══ */
-.header {
+.hdr {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   height: var(--nav-h);
-  background: rgba(17,15,13,0.88);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border-bottom: 1px solid rgba(61,54,46,0.5);
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid var(--border-light);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px;
 }
-.logo-mark {
-  display: flex; align-items: center; gap: 10px;
-}
-.logo-icon {
-  width: 34px; height: 34px; border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; box-shadow: 0 2px 12px rgba(212,160,84,0.3);
-}
-.logo-text {
-  font-family: var(--font-serif);
-  font-size: 1.4rem; font-weight: 600;
-  letter-spacing: -0.3px;
-  background: linear-gradient(135deg, var(--accent-light), var(--accent));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.sync-indicator {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 0.72rem; color: var(--text-muted);
-  padding: 5px 10px; border-radius: 20px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-}
-.sync-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--text-dim);
-  transition: background .3s;
-}
-.sync-dot.online { background: var(--success); box-shadow: 0 0 6px rgba(124,184,124,0.5); }
-.sync-dot.syncing { background: var(--warning); animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-.header-actions { display: flex; gap: 6px; }
-.btn-header {
+.hdr-logo { display: flex; align-items: center; gap: 10px; }
+.hdr-icon {
   width: 36px; height: 36px; border-radius: var(--radius-sm);
-  border: 1px solid var(--border); background: transparent;
-  color: var(--text-muted); cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), #D4944A);
   display: flex; align-items: center; justify-content: center;
-  transition: all .25s ease;
+  color: white; font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(196,125,60,0.3);
 }
-.btn-header:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
-.btn-header svg { width: 17px; height: 17px; }
+.hdr-title {
+  font-family: var(--font-display); font-size: 1.3rem; font-weight: 600;
+  color: var(--text); letter-spacing: -0.3px;
+}
+.hdr-sync {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: var(--radius-full);
+  background: var(--green-bg); font-size: 0.7rem;
+  font-weight: 600; color: var(--green);
+}
+.hdr-sync .dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  animation: livePulse 2s ease infinite;
+}
+@keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+.hdr-sync.off { background: var(--bg-warm); color: var(--text-muted); }
+.hdr-sync.off .dot { background: var(--text-light); animation: none; }
+.hdr-actions { display: flex; gap: 4px; }
+.hdr-btn {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--white);
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.hdr-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lighter); }
+.hdr-btn svg { width: 16px; height: 16px; }
 
-/* ═══ BOTTOM NAV (Mobile) ═══ */
-.bottom-nav {
+/* ═══ BOTTOM NAV ═══ */
+.bnav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  height: var(--bottom-nav-h);
-  background: rgba(17,15,13,0.92);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border-top: 1px solid rgba(61,54,46,0.5);
-  display: flex; align-items: stretch;
-  padding: 0 8px; padding-bottom: env(safe-area-inset-bottom, 0);
+  height: var(--bnav-h);
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-light);
+  display: flex; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0);
 }
-.nav-item {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 3px;
-  border: none; background: none;
-  color: var(--text-dim); cursor: pointer;
-  font-size: 0.65rem; font-weight: 500;
+.bnav-item {
+  flex: 1; border: none; background: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  color: var(--text-light); font-size: 0.62rem; font-weight: 600;
   letter-spacing: 0.3px; text-transform: uppercase;
-  transition: color .2s;
-  position: relative;
+  cursor: pointer; transition: color .2s; position: relative;
+  font-family: var(--font-body);
 }
-.nav-item svg { width: 22px; height: 22px; stroke-width: 1.8; transition: all .25s; }
-.nav-item.active { color: var(--accent); }
-.nav-item.active svg { filter: drop-shadow(0 0 6px rgba(212,160,84,0.4)); }
-.nav-item.active::before {
+.bnav-item svg { width: 22px; height: 22px; stroke-width: 1.8; }
+.bnav-item.on { color: var(--accent); }
+.bnav-item.on::after {
   content: ''; position: absolute; top: 0;
-  width: 24px; height: 2px; border-radius: 0 0 2px 2px;
+  width: 32px; height: 3px; border-radius: 0 0 3px 3px;
   background: var(--accent);
 }
 
-/* ═══ DESKTOP SIDEBAR ═══ */
-@media (min-width: 900px) {
-  .bottom-nav { display: none; }
-  .sidebar {
+/* ═══ SIDEBAR (Desktop) ═══ */
+@media (min-width: 860px) {
+  .bnav { display: none; }
+  .side {
     position: fixed; top: var(--nav-h); left: 0; bottom: 0;
-    width: var(--sidebar-w); z-index: 90;
-    background: rgba(26,23,20,0.6);
-    backdrop-filter: blur(16px);
-    border-right: 1px solid var(--border);
-    padding: 24px 16px;
-    display: flex; flex-direction: column; gap: 4px;
+    width: 240px; background: var(--white);
+    border-right: 1px solid var(--border-light);
+    padding: 20px 12px; display: flex; flex-direction: column; gap: 2px;
   }
-  .sidebar-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 16px; border-radius: var(--radius-sm);
-    border: none; background: none; width: 100%;
-    color: var(--text-secondary); cursor: pointer;
-    font-size: 0.88rem; font-weight: 500;
-    transition: all .2s; text-align: left;
+  .side-lbl {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--text-light); padding: 16px 14px 6px; font-weight: 700;
   }
-  .sidebar-item:hover { background: var(--bg-hover); color: var(--text); }
-  .sidebar-item.active {
-    background: var(--accent-glow);
-    color: var(--accent);
-    box-shadow: inset 3px 0 0 var(--accent);
+  .side-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    border: none; background: none; width: 100%; text-align: left;
+    color: var(--text-secondary); font-size: 0.88rem; font-weight: 500;
+    cursor: pointer; transition: all .15s; font-family: var(--font-body);
   }
-  .sidebar-item svg { width: 20px; height: 20px; flex-shrink: 0; }
-  .sidebar-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); padding: 20px 16px 8px; font-weight: 600; }
-  .main-content { margin-left: var(--sidebar-w); }
+  .side-btn:hover { background: var(--bg-warm); color: var(--text); }
+  .side-btn.on { background: var(--accent-light); color: var(--accent-text); font-weight: 600; }
+  .side-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .wrap { margin-left: 240px; }
 }
-@media (max-width: 899px) {
-  .sidebar { display: none; }
-}
+@media (max-width: 859px) { .side { display: none; } }
 
-/* ═══ MAIN CONTENT ═══ */
-.main-content {
-  position: relative; z-index: 1;
-  padding-top: calc(var(--nav-h) + 20px);
-  padding-bottom: calc(var(--bottom-nav-h) + 40px);
+/* ═══ MAIN WRAP ═══ */
+.wrap {
+  padding-top: calc(var(--nav-h) + 16px);
+  padding-bottom: calc(var(--bnav-h) + 32px);
   min-height: 100dvh;
 }
-.page { display: none; max-width: var(--max-w); margin: 0 auto; padding: 0 16px; }
-.page.active { display: block; animation: pageIn .4s ease; }
-@keyframes pageIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
-}
-@media (min-width: 900px) {
-  .main-content { padding-bottom: 60px; }
-  .page { padding: 0 32px; }
-}
+.pg { display: none; max-width: 800px; margin: 0 auto; padding: 0 16px; }
+.pg.on { display: block; animation: pgIn .35s ease; }
+@keyframes pgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+@media (min-width: 860px) { .wrap { padding-bottom: 48px; } .pg { padding: 0 28px; } }
 
-/* ═══ PAGE HEADERS ═══ */
-.page-header { margin-bottom: 28px; }
-.page-title {
-  font-family: var(--font-serif);
-  font-size: 2rem; font-weight: 600;
-  line-height: 1.15; letter-spacing: -0.5px;
-  background: linear-gradient(135deg, var(--text), var(--text-secondary));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ═══ PAGE HEADER ═══ */
+.pg-hdr { margin-bottom: 24px; }
+.pg-title {
+  font-family: var(--font-display); font-size: 1.75rem; font-weight: 600;
+  color: var(--text); line-height: 1.2; letter-spacing: -0.5px;
 }
-.page-subtitle { color: var(--text-muted); font-size: 0.88rem; margin-top: 6px; font-weight: 400; }
+.pg-sub { color: var(--text-muted); font-size: 0.88rem; margin-top: 4px; }
 
 /* ═══ CARDS ═══ */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px;
-  transition: border-color .3s, box-shadow .3s, transform .3s;
-  position: relative; overflow: hidden;
+.cd {
+  background: var(--white); border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg); padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .25s, border-color .25s;
 }
-.card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212,160,84,0.15), transparent);
+.cd:hover { box-shadow: var(--shadow); }
+.cd + .cd { margin-top: 12px; }
+.cd-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+.cd-title {
+  font-family: var(--font-display); font-size: 1.05rem; font-weight: 600;
+  display: flex; align-items: center; gap: 10px; color: var(--text);
 }
-.card:hover { border-color: rgba(212,160,84,0.2); }
-.card + .card { margin-top: 14px; }
-.card-glow {
-  box-shadow: 0 0 0 1px rgba(212,160,84,0.1), 0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03);
-}
-.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
-.card-title {
-  font-family: var(--font-serif);
-  font-size: 1.15rem; font-weight: 600;
-  display: flex; align-items: center; gap: 10px;
-}
-.card-title-icon {
-  width: 32px; height: 32px; border-radius: var(--radius-xs);
+.cd-ico {
+  width: 30px; height: 30px; border-radius: var(--radius-xs);
   display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
-/* ═══ FORM ELEMENTS ═══ */
-.field { margin-bottom: 16px; }
-.field-label {
-  display: block; font-size: 0.72rem; font-weight: 600;
-  color: var(--text-muted); margin-bottom: 7px;
-  text-transform: uppercase; letter-spacing: 0.8px;
+/* ═══ FIELDS ═══ */
+.fld { margin-bottom: 14px; }
+.fld:last-child { margin-bottom: 0; }
+.fld-lbl {
+  display: block; font-size: 0.72rem; font-weight: 700;
+  color: var(--text-muted); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.7px;
 }
-.field-input, .field-select, .field-textarea {
-  width: 100%; padding: 12px 16px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text); font-size: 0.92rem;
-  outline: none;
-  transition: border-color .25s, box-shadow .25s;
+.fld-in, .fld-sel, .fld-ta {
+  width: 100%; padding: 11px 14px;
+  background: var(--bg-input); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-size: 0.9rem; font-family: var(--font-body);
+  outline: none; transition: border-color .2s, box-shadow .2s;
 }
-.field-input:focus, .field-select:focus, .field-textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow), 0 0 20px rgba(212,160,84,0.08);
+.fld-in:focus, .fld-sel:focus, .fld-ta:focus {
+  border-color: var(--accent); background: var(--white);
+  box-shadow: 0 0 0 3px rgba(196,125,60,0.1);
 }
-.field-input::placeholder, .field-textarea::placeholder { color: var(--text-dim); }
-.field-textarea { min-height: 100px; resize: vertical; line-height: 1.7; }
-.field-select {
+.fld-in::placeholder, .fld-ta::placeholder { color: var(--text-light); }
+.fld-ta { min-height: 100px; resize: vertical; line-height: 1.7; }
+.fld-sel {
   cursor: pointer; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238C8078' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center;
-  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239C8E7E' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
 }
-.field-select option { background: var(--bg-card); color: var(--text); }
-.field-row { display: grid; gap: 12px; }
-.field-row-2 { grid-template-columns: 1fr 1fr; }
-.field-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.fld-sel option { background: var(--white); }
+.row { display: grid; gap: 12px; }
+.row-2 { grid-template-columns: 1fr 1fr; }
+.row-3 { grid-template-columns: 1fr 1fr 1fr; }
 
-/* Toggle switch */
-.toggle-wrap { display: flex; align-items: center; gap: 12px; }
-.toggle {
-  position: relative; width: 48px; height: 26px;
-  background: var(--border); border-radius: 13px;
-  cursor: pointer; transition: background .25s;
-  flex-shrink: 0;
+/* Toggle */
+.tgl-wrap { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
+.tgl {
+  position: relative; width: 44px; height: 24px;
+  background: var(--border); border-radius: 12px;
+  cursor: pointer; transition: background .2s; flex-shrink: 0;
 }
-.toggle.on { background: var(--accent); }
-.toggle::after {
-  content: ''; position: absolute; top: 3px; left: 3px;
+.tgl.on { background: var(--accent); }
+.tgl::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
   width: 20px; height: 20px; border-radius: 50%;
-  background: white; transition: transform .25s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  transition: transform .2s;
 }
-.toggle.on::after { transform: translateX(22px); }
-.toggle-label { font-size: 0.88rem; color: var(--text-secondary); }
+.tgl.on::after { transform: translateX(20px); }
+.tgl-txt { font-size: 0.88rem; color: var(--text-secondary); }
 
 /* ═══ BUTTONS ═══ */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 22px; border: none; border-radius: var(--radius-sm);
-  font-family: var(--font-sans); font-size: 0.88rem; font-weight: 600;
-  cursor: pointer; transition: all .25s; white-space: nowrap;
-  position: relative; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 20px; border: none; border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 0.86rem; font-weight: 600;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
 }
-.btn::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent);
-  pointer-events: none;
+.btn-p {
+  background: var(--accent); color: white;
+  box-shadow: 0 2px 8px rgba(196,125,60,0.25);
 }
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color: #1A1714;
-  box-shadow: 0 2px 12px rgba(212,160,84,0.3);
-}
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(212,160,84,0.4);
-}
-.btn-primary:active { transform: translateY(0); }
-.btn-secondary {
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-.btn-ghost {
-  background: transparent; color: var(--text-muted);
-  padding: 8px 14px;
-}
-.btn-ghost:hover { color: var(--accent); background: var(--accent-glow); }
-.btn-danger-ghost { background: transparent; color: var(--danger); padding: 8px 14px; }
-.btn-danger-ghost:hover { background: var(--danger-bg); }
-.btn-sm { padding: 8px 16px; font-size: 0.8rem; }
-.btn-xs { padding: 6px 12px; font-size: 0.75rem; }
+.btn-p:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(196,125,60,0.3); }
+.btn-s { background: var(--white); color: var(--text-secondary); border: 1.5px solid var(--border); }
+.btn-s:hover { border-color: var(--accent); color: var(--accent); }
+.btn-g { background: transparent; color: var(--text-muted); padding: 8px 12px; }
+.btn-g:hover { color: var(--accent); background: var(--accent-lighter); }
+.btn-d { background: transparent; color: var(--red); padding: 8px 12px; }
+.btn-d:hover { background: var(--red-bg); }
+.btn-sm { padding: 7px 14px; font-size: 0.78rem; }
+.btn-xs { padding: 5px 10px; font-size: 0.72rem; }
 .btn-full { width: 100%; }
-.btn-icon-sm {
-  width: 34px; height: 34px; padding: 0;
-  border-radius: var(--radius-xs); border: 1px solid var(--border);
-  background: transparent; color: var(--text-muted);
+.btn-ico {
+  width: 32px; height: 32px; padding: 0;
+  border-radius: var(--radius-xs); border: 1.5px solid var(--border);
+  background: var(--white); color: var(--text-muted);
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all .2s; flex-shrink: 0;
+  transition: all .15s; flex-shrink: 0;
 }
-.btn-icon-sm:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
-.btn-icon-sm.danger:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+.btn-ico:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ico.del:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
 
 /* ═══ BADGES ═══ */
 .badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 4px 10px; border-radius: 20px;
-  font-size: 0.7rem; font-weight: 600;
-  letter-spacing: 0.3px; text-transform: uppercase;
+  display: inline-flex; align-items: center; padding: 3px 10px;
+  border-radius: var(--radius-full); font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.3px;
 }
-.badge-accent { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(212,160,84,0.2); }
-.badge-success { background: var(--success-bg); color: var(--success); }
-.badge-info { background: var(--info-bg); color: var(--info); }
-.badge-cat {
-  padding: 3px 8px; font-size: 0.68rem;
-}
-
-/* ═══ RECIPE CARDS ═══ */
-.recipe-grid { display: grid; gap: 14px; }
-@media (min-width: 640px) { .recipe-grid { grid-template-columns: 1fr 1fr; } }
-
-.recipe-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px; cursor: pointer;
-  transition: all .3s ease;
-  position: relative; overflow: hidden;
-}
-.recipe-card::before {
-  content: ''; position: absolute; top: 0; left: 0;
-  width: 4px; height: 100%;
-  border-radius: 4px 0 0 4px;
-  transition: opacity .3s;
-}
-.recipe-card[data-cat="Doces"]::before { background: var(--cat-doces); }
-.recipe-card[data-cat="Salgados"]::before { background: var(--cat-salgados); }
-.recipe-card[data-cat="Bolos"]::before { background: var(--cat-bolos); }
-.recipe-card[data-cat="Pães"]::before { background: var(--cat-paes); }
-.recipe-card[data-cat="Tortas"]::before { background: var(--cat-tortas); }
-.recipe-card[data-cat="Bebidas"]::before { background: var(--cat-bebidas); }
-.recipe-card[data-cat="Outros"]::before { background: var(--cat-outros); }
-
-.recipe-card:hover {
-  border-color: rgba(212,160,84,0.25);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(212,160,84,0.08);
-}
-.recipe-card-name {
-  font-family: var(--font-serif);
-  font-size: 1.15rem; font-weight: 600;
-  margin-bottom: 4px; padding-left: 8px;
-}
-.recipe-card-yield {
-  font-size: 0.8rem; color: var(--text-muted);
-  padding-left: 8px;
-}
-.recipe-card-footer {
-  display: flex; align-items: center; gap: 12px;
-  margin-top: 14px; padding-top: 12px;
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-.recipe-stat {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 0.75rem; color: var(--text-muted);
-}
-.recipe-stat svg { width: 14px; height: 14px; }
-
-/* ═══ RECIPE VIEW ═══ */
-.recipe-hero {
-  position: relative; padding: 32px 24px;
-  border-radius: var(--radius-lg);
-  margin-bottom: 20px; overflow: hidden;
-  background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated));
-  border: 1px solid var(--border);
-}
-.recipe-hero::before {
-  content: ''; position: absolute; top: -50%; right: -30%;
-  width: 300px; height: 300px; border-radius: 50%;
-  background: radial-gradient(circle, var(--accent-glow-strong), transparent 70%);
-  pointer-events: none;
-}
-.recipe-hero-name {
-  font-family: var(--font-serif);
-  font-size: 2rem; font-weight: 600;
-  line-height: 1.2; margin-bottom: 6px;
-  position: relative;
-}
-.recipe-hero-yield {
-  color: var(--text-secondary); font-size: 0.92rem;
-  position: relative;
-}
-
-/* Ingredients table */
-.ing-table { width: 100%; border-collapse: collapse; }
-.ing-table th {
-  text-align: left; padding: 10px 12px;
-  font-size: 0.68rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.8px;
-  color: var(--text-dim); border-bottom: 1px solid var(--border);
-}
-.ing-table td {
-  padding: 12px; font-size: 0.9rem;
-  border-bottom: 1px solid rgba(61,54,46,0.4);
-  vertical-align: top;
-}
-.ing-table tr:last-child td { border-bottom: none; }
-.ing-table tr:hover td { background: rgba(255,255,255,0.015); }
-.ing-name { font-weight: 500; }
-.ing-conv { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
-.ing-cost { color: var(--accent); font-weight: 600; font-size: 0.85rem; }
-.ing-cost.none { color: var(--text-dim); font-weight: 400; }
-
-/* Prep steps */
-.prep-steps { counter-reset: step; }
-.prep-step {
-  display: flex; gap: 16px;
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(61,54,46,0.3);
-}
-.prep-step:last-child { border-bottom: none; }
-.step-num {
-  counter-increment: step;
-  flex-shrink: 0;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--accent-glow);
-  border: 1px solid rgba(212,160,84,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.78rem; font-weight: 700; color: var(--accent);
-}
-.step-text { font-size: 0.92rem; line-height: 1.7; color: var(--text-secondary); padding-top: 4px; }
-
-/* ═══ COST RESULT PANEL ═══ */
-.cost-panel {
-  background: linear-gradient(135deg, rgba(212,160,84,0.06), rgba(212,160,84,0.02));
-  border: 1px solid rgba(212,160,84,0.15);
-  border-radius: var(--radius); padding: 24px;
-  position: relative; overflow: hidden;
-}
-.cost-panel::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-}
-.cost-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 9px 0; font-size: 0.9rem;
-}
-.cost-row .label { color: var(--text-muted); }
-.cost-row .val { font-weight: 600; }
-.cost-divider {
-  height: 1px; background: var(--border);
-  margin: 8px 0;
-}
-.cost-total {
-  padding-top: 14px; margin-top: 8px;
-  border-top: 2px solid var(--accent);
-}
-.cost-total .label { font-weight: 700; color: var(--text); font-size: 1rem; }
-.cost-total .val {
-  font-family: var(--font-serif);
-  font-size: 1.6rem; font-weight: 700; color: var(--accent);
-}
-.cost-unit-price {
-  text-align: right; margin-top: 6px;
-  font-size: 0.85rem; color: var(--text-secondary);
-}
-.cost-unit-price strong { color: var(--accent-light); }
-.cost-section-title {
-  font-size: 0.72rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.8px;
-  color: var(--text-dim); margin: 16px 0 8px;
-}
-
-/* ═══ INGREDIENT ROW (Form) ═══ */
-.ing-form-row {
-  display: grid; grid-template-columns: 1fr 80px 100px 34px;
-  gap: 8px; align-items: center; margin-bottom: 8px;
-}
-.ing-form-row .field-input, .ing-form-row .field-select { padding: 10px 12px; font-size: 0.85rem; }
-@media (max-width: 480px) {
-  .ing-form-row { grid-template-columns: 1fr 34px; }
-  .ing-form-row > :first-child { grid-column: 1 / -1; }
-  .ing-form-row > :nth-child(2),
-  .ing-form-row > :nth-child(3) { grid-column: span 1; }
-  .ing-form-row { grid-template-columns: 1fr 1fr 34px; }
-  .ing-form-row > :first-child { grid-column: 1 / -1; }
-}
-
-/* ═══ PRICE LIST ═══ */
-.price-row {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(61,54,46,0.4);
-}
-.price-row:last-child { border-bottom: none; }
-.price-info { flex: 1; min-width: 0; }
-.price-name { font-weight: 600; font-size: 0.92rem; }
-.price-brand { font-size: 0.78rem; color: var(--text-muted); }
-.price-detail { text-align: right; }
-.price-value { font-weight: 700; color: var(--accent); font-size: 0.95rem; }
-.price-unit { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
 
 /* ═══ SEARCH ═══ */
-.search-wrap {
-  position: relative; margin-bottom: 20px;
+.srch {
+  position: relative; margin-bottom: 18px;
 }
-.search-wrap svg {
+.srch svg {
   position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-  width: 18px; height: 18px; color: var(--text-dim); pointer-events: none;
+  width: 16px; height: 16px; color: var(--text-light); pointer-events: none;
 }
-.search-input {
-  width: 100%; padding: 12px 16px 12px 42px;
-  background: var(--bg-card); border: 1px solid var(--border);
+.srch input {
+  width: 100%; padding: 11px 14px 11px 40px;
+  background: var(--white); border: 1.5px solid var(--border);
   border-radius: var(--radius); color: var(--text);
-  font-size: 0.9rem; outline: none;
-  transition: border-color .25s, box-shadow .25s;
+  font-size: 0.88rem; font-family: var(--font-body); outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  box-shadow: var(--shadow-sm);
 }
-.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-.search-input::placeholder { color: var(--text-dim); }
+.srch input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(196,125,60,0.1); }
+.srch input::placeholder { color: var(--text-light); }
 
-/* ═══ EMPTY STATE ═══ */
-.empty {
-  text-align: center; padding: 56px 24px;
+/* ═══ RECIPE CARDS ═══ */
+.rg { display: grid; gap: 12px; }
+@media (min-width: 580px) { .rg { grid-template-columns: 1fr 1fr; } }
+.rc {
+  background: var(--white); border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-lg); padding: 18px 20px;
+  cursor: pointer; transition: all .25s;
+  box-shadow: var(--shadow-sm); position: relative;
+  overflow: hidden;
 }
-.empty-icon {
-  width: 72px; height: 72px; margin: 0 auto 20px;
-  border-radius: 50%;
-  background: var(--accent-glow);
+.rc::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px; opacity: 0; transition: opacity .25s;
+}
+.rc:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.rc:hover::before { opacity: 1; }
+.rc[data-c="Doces"]::before{background:var(--cat-doces)} .rc[data-c="Salgados"]::before{background:var(--cat-salgados)}
+.rc[data-c="Bolos"]::before{background:var(--cat-bolos)} .rc[data-c="Pães"]::before{background:var(--cat-paes)}
+.rc[data-c="Tortas"]::before{background:var(--cat-tortas)} .rc[data-c="Bebidas"]::before{background:var(--cat-bebidas)}
+.rc[data-c="Outros"]::before{background:var(--cat-outros)}
+.rc-name { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; margin-bottom: 2px; }
+.rc-yield { font-size: 0.78rem; color: var(--text-muted); }
+.rc-foot {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-light);
+}
+.rc-tag {
+  padding: 2px 8px; border-radius: var(--radius-full);
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2px;
+}
+.rc-stat { font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 3px; }
+
+/* ═══ RECIPE DETAIL ═══ */
+.r-hero {
+  background: linear-gradient(135deg, var(--accent-lighter), var(--bg-warm));
+  border: 1.5px solid var(--border); border-radius: var(--radius-xl);
+  padding: 28px 24px; margin-bottom: 16px;
+  position: relative; overflow: hidden;
+}
+.r-hero::after {
+  content: ''; position: absolute; top: -40%; right: -20%;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,125,60,0.08), transparent 70%);
+}
+.r-hero-name { font-family: var(--font-display); font-size: 1.7rem; font-weight: 600; position: relative; margin-bottom: 4px; }
+.r-hero-sub { color: var(--text-secondary); font-size: 0.9rem; position: relative; }
+
+/* Ingredients table */
+.it { width: 100%; border-collapse: collapse; }
+.it th {
+  text-align: left; padding: 8px 10px;
+  font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-light); border-bottom: 1.5px solid var(--border);
+}
+.it td { padding: 11px 10px; font-size: 0.88rem; border-bottom: 1px solid var(--border-light); vertical-align: top; }
+.it tr:last-child td { border-bottom: none; }
+.it tr:hover td { background: var(--accent-lighter); }
+
+/* Steps */
+.stp {
+  display: flex; gap: 14px; padding: 14px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.stp:last-child { border-bottom: none; }
+.stp-n {
+  flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent-light); color: var(--accent-text);
   display: flex; align-items: center; justify-content: center;
-  font-size: 2rem;
+  font-size: 0.75rem; font-weight: 700;
 }
-.empty h3 {
-  font-family: var(--font-serif);
-  font-size: 1.2rem; margin-bottom: 8px;
+.stp-t { font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); padding-top: 3px; }
+
+/* Cost panel */
+.cp {
+  background: linear-gradient(135deg, var(--accent-lighter), #FFF9F3);
+  border: 1.5px solid rgba(196,125,60,0.2);
+  border-radius: var(--radius-lg); padding: 24px;
+  box-shadow: var(--shadow);
 }
-.empty p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 24px; max-width: 300px; margin-left: auto; margin-right: auto; }
+.cp-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 0.88rem; }
+.cp-row .l { color: var(--text-muted); }
+.cp-row .v { font-weight: 600; color: var(--text); }
+.cp-div { height: 1px; background: rgba(196,125,60,0.15); margin: 6px 0; }
+.cp-total { border-top: 2px solid var(--accent); padding-top: 12px; margin-top: 8px; }
+.cp-total .l { font-weight: 700; color: var(--text); font-size: 0.95rem; }
+.cp-total .v { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+.cp-unit { text-align: right; font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px; }
+.cp-unit strong { color: var(--accent-text); }
+.cp-sec { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); margin: 14px 0 6px; }
+
+/* ═══ ING FORM ROW ═══ */
+.ifr {
+  display: grid; grid-template-columns: 1fr 76px 96px 32px;
+  gap: 6px; align-items: center; margin-bottom: 6px;
+}
+.ifr .fld-in, .ifr .fld-sel { padding: 9px 10px; font-size: 0.84rem; }
+@media (max-width: 480px) {
+  .ifr { grid-template-columns: 1fr 1fr 32px; }
+  .ifr > :first-child { grid-column: 1 / -1; }
+}
+
+/* ═══ PRICE ROW ═══ */
+.pr { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+.pr:last-child { border-bottom: none; }
+.pr-i { flex: 1; min-width: 0; }
+.pr-n { font-weight: 600; font-size: 0.9rem; }
+.pr-b { font-size: 0.75rem; color: var(--text-muted); }
+.pr-d { text-align: right; }
+.pr-v { font-weight: 700; color: var(--accent-text); font-size: 0.92rem; }
+.pr-u { font-size: 0.7rem; color: var(--text-muted); margin-top: 1px; }
 
 /* ═══ MODAL ═══ */
-.modal-bg {
+.mo-bg {
   display: none; position: fixed; inset: 0; z-index: 300;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(44,36,24,0.3);
+  backdrop-filter: blur(8px);
 }
-.modal-bg.open { display: flex; align-items: flex-end; justify-content: center; animation: fadeBg .2s ease; }
-@keyframes fadeBg { from { opacity: 0; } to { opacity: 1; } }
-@media (min-width: 640px) { .modal-bg.open { align-items: center; } }
-
-.modal-sheet {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  width: 100%; max-width: 680px; max-height: 92dvh;
-  overflow-y: auto; padding: 28px 22px;
-  animation: sheetUp .35s cubic-bezier(.22,1,.36,1);
-  border: 1px solid var(--border);
-  border-bottom: none;
+.mo-bg.on { display: flex; align-items: flex-end; justify-content: center; animation: mFade .2s; }
+@keyframes mFade { from{opacity:0} to{opacity:1} }
+@media (min-width: 640px) { .mo-bg.on { align-items: center; } }
+.mo {
+  background: var(--white);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%; max-width: 660px; max-height: 92dvh;
+  overflow-y: auto; padding: 28px 20px;
+  animation: mUp .3s cubic-bezier(.22,1,.36,1);
+  box-shadow: var(--shadow-xl);
 }
-@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes mUp { from{transform:translateY(100%)} to{transform:none} }
 @media (min-width: 640px) {
-  .modal-sheet { border-radius: var(--radius-lg); border-bottom: 1px solid var(--border); padding: 32px; }
-  @keyframes sheetUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .mo { border-radius: var(--radius-xl); padding: 32px 28px; }
+  @keyframes mUp { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
 }
-.modal-title {
-  font-family: var(--font-serif);
-  font-size: 1.4rem; font-weight: 600;
-  margin-bottom: 24px;
-}
+.mo-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; }
 
 /* ═══ FAB ═══ */
 .fab {
   position: fixed; z-index: 50;
-  bottom: calc(var(--bottom-nav-h) + 16px); right: 20px;
-  width: 56px; height: 56px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  border: none; color: #1A1714; cursor: pointer;
+  bottom: calc(var(--bnav-h) + 16px); right: 20px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--accent); border: none; color: white;
+  font-size: 1.5rem; font-weight: 300; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.6rem; font-weight: 300;
-  box-shadow: 0 4px 20px rgba(212,160,84,0.4), 0 0 0 4px rgba(212,160,84,0.1);
-  transition: all .25s;
+  box-shadow: 0 4px 16px rgba(196,125,60,0.35), 0 0 0 4px rgba(196,125,60,0.1);
+  transition: all .2s;
 }
-.fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(212,160,84,0.5); }
-@media (min-width: 900px) { .fab { bottom: 32px; right: 32px; } }
+.fab:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(196,125,60,0.4); }
+@media (min-width: 860px) { .fab { bottom: 28px; right: 28px; } }
 
 /* ═══ TOAST ═══ */
-.toast {
-  position: fixed; bottom: calc(var(--bottom-nav-h) + 20px);
-  left: 50%; transform: translateX(-50%) translateY(80px);
-  padding: 12px 24px; border-radius: var(--radius);
-  font-size: 0.88rem; font-weight: 600;
+.tst {
+  position: fixed; bottom: calc(var(--bnav-h) + 16px);
+  left: 50%; transform: translateX(-50%) translateY(60px);
+  padding: 10px 22px; border-radius: var(--radius);
+  font-size: 0.86rem; font-weight: 600;
   z-index: 999; pointer-events: none;
-  opacity: 0; transition: all .35s cubic-bezier(.22,1,.36,1);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  opacity: 0; transition: all .3s cubic-bezier(.22,1,.36,1);
+  box-shadow: var(--shadow-lg);
 }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.success { background: var(--success); color: #1A1714; }
-.toast.error { background: var(--danger); color: #fff; }
-.toast.info { background: var(--info); color: #fff; }
+.tst.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.tst.ok { background: var(--green); color: white; }
+.tst.err { background: var(--red); color: white; }
+.tst.inf { background: var(--blue); color: white; }
 
-/* ═══ SETUP WIZARD ═══ */
-.setup-page {
-  max-width: 560px; margin: 0 auto; padding: 0 20px;
-  text-align: center;
-}
-.setup-hero { margin-bottom: 32px; }
-.setup-hero-icon {
-  width: 80px; height: 80px; margin: 0 auto 20px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+/* ═══ EMPTY ═══ */
+.emp { text-align: center; padding: 48px 20px; }
+.emp-ico {
+  width: 64px; height: 64px; margin: 0 auto 16px;
+  border-radius: 50%; background: var(--accent-light);
   display: flex; align-items: center; justify-content: center;
-  font-size: 2.4rem;
-  box-shadow: 0 8px 32px rgba(212,160,84,0.3);
+  font-size: 1.6rem;
 }
-.setup-hero h1 {
-  font-family: var(--font-serif);
-  font-size: 1.8rem; font-weight: 600;
-  margin-bottom: 8px;
-}
-.setup-hero p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
-.setup-steps { text-align: left; margin: 28px 0; }
-.setup-step {
-  display: flex; gap: 14px; padding: 16px 0;
-  border-bottom: 1px solid var(--border);
-}
-.setup-step:last-child { border-bottom: none; }
-.setup-step-num {
-  flex-shrink: 0; width: 28px; height: 28px;
-  border-radius: 50%; background: var(--accent-glow);
-  border: 1px solid rgba(212,160,84,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.78rem; font-weight: 700; color: var(--accent);
-}
-.setup-step-text { font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary); }
-.setup-step-text a { color: var(--accent); text-decoration: none; }
-.setup-step-text a:hover { text-decoration: underline; }
-.setup-step-text code {
-  background: var(--bg-elevated); padding: 2px 6px;
-  border-radius: 4px; font-size: 0.82rem; color: var(--accent-light);
-}
+.emp h3 { font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 6px; }
+.emp p { color: var(--text-muted); font-size: 0.86rem; margin-bottom: 20px; max-width: 280px; margin-left: auto; margin-right: auto; }
 
-/* ═══ UTILITIES ═══ */
-.mt-4 { margin-top: 4px; }
-.mt-8 { margin-top: 8px; }
-.mt-12 { margin-top: 12px; }
-.mt-16 { margin-top: 16px; }
-.mt-20 { margin-top: 20px; }
-.mt-24 { margin-top: 24px; }
-.mb-8 { margin-bottom: 8px; }
-.mb-12 { margin-bottom: 12px; }
-.mb-16 { margin-bottom: 16px; }
-.mb-20 { margin-bottom: 20px; }
-.gap-8 { gap: 8px; }
-.gap-12 { gap: 12px; }
-.flex { display: flex; }
-.flex-wrap { flex-wrap: wrap; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.justify-end { justify-content: flex-end; }
-.text-muted { color: var(--text-muted); }
-.text-dim { color: var(--text-dim); }
-.text-accent { color: var(--accent); }
-.text-sm { font-size: 0.82rem; }
-.text-xs { font-size: 0.72rem; }
-.fw-500 { font-weight: 500; }
-.fw-600 { font-weight: 600; }
-.fw-700 { font-weight: 700; }
-.serif { font-family: var(--font-serif); }
-.hidden { display: none !important; }
-.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.w-full { width: 100%; }
+/* ═══ SETTINGS MINIMAL ═══ */
+.set-section { margin-bottom: 8px; }
+.set-section .cd-title { font-size: 0.95rem; }
+
+/* ═══ UTILS ═══ */
+.mt-4{margin-top:4px} .mt-8{margin-top:8px} .mt-12{margin-top:12px}
+.mt-16{margin-top:16px} .mt-20{margin-top:20px} .mb-8{margin-bottom:8px}
+.mb-12{margin-bottom:12px} .mb-16{margin-bottom:16px} .mb-20{margin-bottom:20px}
+.gap-6{gap:6px} .gap-8{gap:8px} .gap-12{gap:12px}
+.flex{display:flex} .fw{flex-wrap:wrap} .fc{flex-direction:column}
+.ac{align-items:center} .jb{justify-content:space-between} .je{justify-content:flex-end}
+.tm{color:var(--text-muted)} .ts{color:var(--text-secondary)} .ta{color:var(--accent-text)}
+.tsm{font-size:0.82rem} .txs{font-size:0.72rem} .fw6{font-weight:600} .fw7{font-weight:700}
+.dn{display:none!important}
 </style>
 </head>
 <body>
 
 <!-- ═══ HEADER ═══ -->
-<header class="header">
-  <div class="logo-mark">
-    <div class="logo-icon">🍰</div>
-    <div class="logo-text">ReceitaPro</div>
+<header class="hdr">
+  <div class="hdr-logo">
+    <div class="hdr-icon">🍰</div>
+    <div class="hdr-title">ReceitaPro</div>
   </div>
-  <div class="sync-indicator" id="syncStatus">
-    <div class="sync-dot" id="syncDot"></div>
-    <span id="syncLabel">Offline</span>
-  </div>
-  <div class="header-actions">
-    <button class="btn-header" onclick="exportAll()" title="Exportar backup">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-    </button>
-    <button class="btn-header" onclick="document.getElementById('impFile').click()" title="Importar backup">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
-    </button>
-    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importAll(event)">
-    <button class="btn-header" onclick="nav('settings')" title="Configurações">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    </button>
+  <div class="hdr-sync off" id="syncBadge"><div class="dot"></div><span id="syncTxt">Conectando...</span></div>
+  <div class="hdr-actions">
+    <button class="hdr-btn" onclick="doExport()" title="Exportar"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></button>
+    <button class="hdr-btn" onclick="document.getElementById('impF').click()" title="Importar"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></button>
+    <input type="file" id="impF" accept=".json" style="display:none" onchange="doImport(event)">
   </div>
 </header>
 
-<!-- ═══ DESKTOP SIDEBAR ═══ -->
-<aside class="sidebar">
-  <div class="sidebar-label">Menu</div>
-  <button class="sidebar-item active" data-page="recipes" onclick="nav('recipes')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-    Receitas
-  </button>
-  <button class="sidebar-item" data-page="prices" onclick="nav('prices')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-    Tabela de Preços
-  </button>
-  <button class="sidebar-item" data-page="calculator" onclick="nav('calculator')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4M8 18h4"/></svg>
-    Calculadora
-  </button>
-  <div class="sidebar-label">Sistema</div>
-  <button class="sidebar-item" data-page="settings" onclick="nav('settings')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    Configurações
-  </button>
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="side">
+  <div class="side-lbl">Menu</div>
+  <button class="side-btn on" data-p="recipes" onclick="go('recipes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Receitas</button>
+  <button class="side-btn" data-p="prices" onclick="go('prices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Tabela de Preços</button>
+  <button class="side-btn" data-p="calc" onclick="go('calc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4M8 18h4"/></svg>Calculadora</button>
+  <div class="side-lbl">Sistema</div>
+  <button class="side-btn" data-p="config" onclick="go('config')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Configurações</button>
 </aside>
 
-<!-- ═══ BOTTOM NAV (Mobile) ═══ -->
-<nav class="bottom-nav">
-  <button class="nav-item active" data-page="recipes" onclick="nav('recipes')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-    Receitas
-  </button>
-  <button class="nav-item" data-page="prices" onclick="nav('prices')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-    Preços
-  </button>
-  <button class="nav-item" data-page="calculator" onclick="nav('calculator')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4M8 18h4"/></svg>
-    Calcular
-  </button>
-  <button class="nav-item" data-page="settings" onclick="nav('settings')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    Config
-  </button>
+<!-- ═══ BOTTOM NAV ═══ -->
+<nav class="bnav">
+  <button class="bnav-item on" data-p="recipes" onclick="go('recipes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Receitas</button>
+  <button class="bnav-item" data-p="prices" onclick="go('prices')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Preços</button>
+  <button class="bnav-item" data-p="calc" onclick="go('calc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4M8 18h4"/></svg>Calcular</button>
+  <button class="bnav-item" data-p="config" onclick="go('config')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Config</button>
 </nav>
 
-<!-- ═══ MAIN ═══ -->
-<div class="main-content">
+<!-- ═══ CONTENT ═══ -->
+<div class="wrap">
 
-<!-- ══════ PAGE: RECEITAS ══════ -->
-<div class="page active" id="pg-recipes">
-  <div id="recipeListView">
-    <div class="page-header flex justify-between items-center flex-wrap gap-12">
-      <div>
-        <h1 class="page-title">Suas Receitas</h1>
-        <p class="page-subtitle" id="recipeCountLabel">Carregando...</p>
-      </div>
+<!-- PAGE: RECEITAS -->
+<div class="pg on" id="pg-recipes">
+  <div id="vList">
+    <div class="pg-hdr flex jb ac fw gap-12">
+      <div><h1 class="pg-title">Suas Receitas</h1><p class="pg-sub" id="rCount">Carregando...</p></div>
     </div>
-    <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input class="search-input" type="text" placeholder="Buscar por nome ou categoria..." id="searchRecipe" oninput="renderRecipes()">
-    </div>
-    <div class="recipe-grid" id="recipesGrid"></div>
+    <div class="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input placeholder="Buscar receita..." id="sR" oninput="drawR()"></div>
+    <div class="rg" id="rGrid"></div>
   </div>
-
-  <!-- RECIPE DETAIL -->
-  <div id="recipeDetailView" class="hidden">
-    <div class="flex justify-between items-center mb-20 flex-wrap gap-8">
-      <button class="btn btn-ghost btn-sm" onclick="closeRecipeDetail()">← Voltar</button>
-      <div class="flex gap-8">
-        <button class="btn btn-secondary btn-sm" id="btnEditRecipe">✏️ Editar</button>
-        <button class="btn btn-danger-ghost btn-sm" id="btnDeleteRecipe">🗑️</button>
-      </div>
-    </div>
-    <div id="recipeDetailContent"></div>
-  </div>
-
-  <button class="fab" id="fabRecipe" onclick="openRecipeModal()">+</button>
+  <div id="vDetail" class="dn"></div>
+  <button class="fab" id="fabR" onclick="openMo()">+</button>
 </div>
 
-<!-- ══════ PAGE: PREÇOS ══════ -->
-<div class="page" id="pg-prices">
-  <div class="page-header">
-    <h1 class="page-title">Tabela de Preços</h1>
-    <p class="page-subtitle">Cadastre os ingredientes e seus preços para cálculo automático do custo</p>
+<!-- PAGE: PREÇOS -->
+<div class="pg" id="pg-prices">
+  <div class="pg-hdr"><h1 class="pg-title">Tabela de Preços</h1><p class="pg-sub">Preços dos ingredientes para cálculo automático</p></div>
+  <div class="cd mb-16">
+    <div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--accent-light)">🏷️</div>Novo Produto</div></div>
+    <div class="row row-2"><div class="fld"><label class="fld-lbl">Nome</label><input class="fld-in" id="pN" placeholder="Ex: Farinha de Trigo"></div><div class="fld"><label class="fld-lbl">Marca</label><input class="fld-in" id="pB" placeholder="Opcional"></div></div>
+    <div class="row row-3 mt-8"><div class="fld"><label class="fld-lbl">Preço (R$)</label><input class="fld-in" type="number" step="0.01" id="pV" placeholder="0,00"></div><div class="fld"><label class="fld-lbl">Quantidade</label><input class="fld-in" type="number" step="0.01" id="pQ" placeholder="1"></div><div class="fld"><label class="fld-lbl">Unidade</label><select class="fld-sel" id="pU"><option value="kg">kg</option><option value="g">g</option><option value="L">Litro</option><option value="ml">ml</option><option value="un">Unidade</option><option value="dz">Dúzia</option><option value="pacote">Pacote</option></select></div></div>
+    <button class="btn btn-p mt-12" onclick="addP()">+ Adicionar</button>
   </div>
-
-  <div class="card card-glow mb-20">
-    <div class="card-header">
-      <div class="card-title"><div class="card-title-icon" style="background:var(--accent-glow)">🏷️</div> Adicionar Produto</div>
-    </div>
-    <div class="field-row field-row-2">
-      <div class="field"><label class="field-label">Nome</label><input class="field-input" id="prName" placeholder="Ex: Farinha de Trigo"></div>
-      <div class="field"><label class="field-label">Marca (opcional)</label><input class="field-input" id="prBrand" placeholder="Ex: Dona Benta"></div>
-    </div>
-    <div class="field-row field-row-3">
-      <div class="field"><label class="field-label">Preço (R$)</label><input class="field-input" type="number" step="0.01" id="prPrice" placeholder="0,00"></div>
-      <div class="field"><label class="field-label">Quantidade</label><input class="field-input" type="number" step="0.01" id="prQty" placeholder="1"></div>
-      <div class="field"><label class="field-label">Unidade</label>
-        <select class="field-select" id="prUnit">
-          <option value="kg">kg</option><option value="g">g</option>
-          <option value="L">Litro (L)</option><option value="ml">ml</option>
-          <option value="un">Unidade</option><option value="dz">Dúzia</option>
-          <option value="pacote">Pacote</option>
-        </select>
-      </div>
-    </div>
-    <button class="btn btn-primary mt-8" onclick="addPrice()">+ Adicionar</button>
-  </div>
-
-  <div class="search-wrap">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-    <input class="search-input" type="text" placeholder="Buscar produto..." id="searchPrice" oninput="renderPrices()">
-  </div>
-  <div id="pricesContainer"></div>
+  <div class="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input placeholder="Buscar produto..." id="sP" oninput="drawP()"></div>
+  <div id="pBox"></div>
 </div>
 
-<!-- ══════ PAGE: CALCULADORA ══════ -->
-<div class="page" id="pg-calculator">
-  <div class="page-header">
-    <h1 class="page-title">Calculadora de Custos</h1>
-    <p class="page-subtitle">Selecione a receita e configure a precificação</p>
-  </div>
-
-  <div class="card card-glow">
-    <div class="field"><label class="field-label">Receita</label>
-      <select class="field-select" id="calcRecipeSelect" onchange="runCalc()"><option value="">— Selecione uma receita —</option></select>
+<!-- PAGE: CALCULADORA -->
+<div class="pg" id="pg-calc">
+  <div class="pg-hdr"><h1 class="pg-title">Calculadora</h1><p class="pg-sub">Precificação automática com todos os custos</p></div>
+  <div class="cd">
+    <div class="fld"><label class="fld-lbl">Receita</label><select class="fld-sel" id="cSel" onchange="calc()"><option value="">— Selecione —</option></select></div>
+    <div class="row row-2 mt-8">
+      <div class="fld"><label class="fld-lbl">Margem de Lucro (%)</label><input class="fld-in" type="number" id="cMar" value="200" oninput="calc()"></div>
+      <div class="fld"><label class="fld-lbl">Rendimento (un)</label><input class="fld-in" type="number" id="cYld" value="1" min="1" oninput="calc()"></div>
     </div>
-    <div class="field-row field-row-2">
-      <div class="field"><label class="field-label">Margem de Lucro (%)</label>
-        <input class="field-input" type="number" id="calcMargin" value="200" min="0" oninput="runCalc()">
-      </div>
-      <div class="field"><label class="field-label">Rendimento (unidades)</label>
-        <input class="field-input" type="number" id="calcYield" value="1" min="1" oninput="runCalc()">
-      </div>
-    </div>
+    <div class="tgl-wrap mt-12"><div class="tgl" id="cMaq" onclick="this.classList.toggle('on');calc()"></div><span class="tgl-txt">Incluir taxa da maquininha</span></div>
   </div>
-
-  <div id="calcOutput" class="mt-16"></div>
+  <div id="cOut" class="mt-16"></div>
 </div>
 
-<!-- ══════ PAGE: CONFIGURAÇÕES ══════ -->
-<div class="page" id="pg-settings">
-  <div class="page-header">
-    <h1 class="page-title">Configurações</h1>
-    <p class="page-subtitle">Configure os valores padrão e conexão com Firebase</p>
+<!-- PAGE: CONFIG -->
+<div class="pg" id="pg-config">
+  <div class="pg-hdr"><h1 class="pg-title">Configurações</h1><p class="pg-sub">Valores padrão para os cálculos</p></div>
+  <div class="cd set-section mb-12">
+    <div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--blue-bg)">⚡</div>Energia e Gás</div></div>
+    <div class="row row-2"><div class="fld"><label class="fld-lbl">kWh (R$)</label><input class="fld-in" type="number" step="0.01" id="sKwh" value="0.75" onchange="saveCfg()"></div><div class="fld"><label class="fld-lbl">Potência Forno (W)</label><input class="fld-in" type="number" id="sOW" value="1500" onchange="saveCfg()"></div></div>
+    <div class="row row-2 mt-8"><div class="fld"><label class="fld-lbl">Botijão (R$)</label><input class="fld-in" type="number" step="0.01" id="sGas" value="110" onchange="saveCfg()"></div><div class="fld"><label class="fld-lbl">Duração (horas)</label><input class="fld-in" type="number" id="sGH" value="60" onchange="saveCfg()"></div></div>
   </div>
-
-  <!-- Firebase Setup -->
-  <div class="card card-glow mb-16">
-    <div class="card-header">
-      <div class="card-title"><div class="card-title-icon" style="background:var(--warning-bg)">🔥</div> Firebase — Sincronização</div>
-      <span class="badge" id="fbBadge">Desconectado</span>
-    </div>
-    <p class="text-sm text-muted mb-16">Conecte ao Firebase para sincronizar dados entre dispositivos em tempo real. É gratuito!</p>
-    <div class="setup-steps" style="margin:0">
-      <div class="setup-step" style="padding:10px 0">
-        <div class="setup-step-num">1</div>
-        <div class="setup-step-text">Acesse <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> e crie um projeto gratuito</div>
-      </div>
-      <div class="setup-step" style="padding:10px 0">
-        <div class="setup-step-num">2</div>
-        <div class="setup-step-text">Vá em <strong>Realtime Database</strong> → Criar banco → Modo teste</div>
-      </div>
-      <div class="setup-step" style="padding:10px 0">
-        <div class="setup-step-num">3</div>
-        <div class="setup-step-text">Vá em ⚙️ Configurações do projeto → seus aplicativos → Web (<code>&lt;/&gt;</code>) → registre e copie o <code>firebaseConfig</code></div>
-      </div>
-    </div>
-    <div class="field mt-16">
-      <label class="field-label">Cole o firebaseConfig aqui (JSON)</label>
-      <textarea class="field-textarea" id="cfgFirebase" placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}' rows="4"></textarea>
-    </div>
-    <div class="flex gap-8 mt-8">
-      <button class="btn btn-primary btn-sm" onclick="connectFirebase()">🔗 Conectar</button>
-      <button class="btn btn-secondary btn-sm" onclick="disconnectFirebase()">Desconectar</button>
-    </div>
+  <div class="cd set-section mb-12">
+    <div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--green-bg)">💳</div>Maquininha</div></div>
+    <div class="row row-2"><div class="fld"><label class="fld-lbl">Taxa Débito (%)</label><input class="fld-in" type="number" step="0.01" id="sTD" value="1.99" onchange="saveCfg()"></div><div class="fld"><label class="fld-lbl">Taxa Crédito (%)</label><input class="fld-in" type="number" step="0.01" id="sTC" value="3.49" onchange="saveCfg()"></div></div>
   </div>
-
-  <!-- Defaults -->
-  <div class="card mb-16">
-    <div class="card-header">
-      <div class="card-title"><div class="card-title-icon" style="background:var(--info-bg)">⚡</div> Energia e Gás</div>
-    </div>
-    <div class="field-row field-row-2">
-      <div class="field"><label class="field-label">kWh (R$)</label><input class="field-input" type="number" step="0.01" id="cfgKwh" value="0.75" onchange="saveSettings()"></div>
-      <div class="field"><label class="field-label">Potência Forno (W)</label><input class="field-input" type="number" id="cfgOvenW" value="1500" onchange="saveSettings()"></div>
-    </div>
-    <div class="field-row field-row-2">
-      <div class="field"><label class="field-label">Botijão Gás (R$)</label><input class="field-input" type="number" step="0.01" id="cfgGas" value="110" onchange="saveSettings()"></div>
-      <div class="field"><label class="field-label">Duração Botijão (h)</label><input class="field-input" type="number" id="cfgGasH" value="60" onchange="saveSettings()"></div>
-    </div>
+  <div class="cd set-section mb-12">
+    <div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--accent-light)">📊</div>Padrão</div></div>
+    <div class="fld"><label class="fld-lbl">Margem Padrão (%)</label><input class="fld-in" type="number" id="sMar" value="200" onchange="saveCfg()"></div>
   </div>
-  <div class="card mb-16">
-    <div class="card-header">
-      <div class="card-title"><div class="card-title-icon" style="background:var(--success-bg)">💳</div> Maquininha</div>
-    </div>
-    <div class="field-row field-row-2">
-      <div class="field"><label class="field-label">Taxa Débito (%)</label><input class="field-input" type="number" step="0.01" id="cfgTxDeb" value="1.99" onchange="saveSettings()"></div>
-      <div class="field"><label class="field-label">Taxa Crédito (%)</label><input class="field-input" type="number" step="0.01" id="cfgTxCred" value="3.49" onchange="saveSettings()"></div>
-    </div>
-  </div>
-  <div class="card mb-16">
-    <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--accent-glow)">📊</div> Padrões</div></div>
-    <div class="field"><label class="field-label">Margem Padrão (%)</label><input class="field-input" type="number" id="cfgMargin" value="200" onchange="saveSettings()"></div>
-  </div>
-  <div class="card" style="border-color:rgba(212,112,112,0.3)">
-    <div class="card-header"><div class="card-title" style="color:var(--danger)">⚠️ Dados</div></div>
-    <p class="text-sm text-muted mb-16">Exporte um backup antes de limpar. Se Firebase estiver conectado, limpar local não afeta a nuvem.</p>
-    <div class="flex gap-8 flex-wrap">
-      <button class="btn btn-secondary btn-sm" onclick="exportAll()">📥 Exportar JSON</button>
-      <button class="btn btn-danger-ghost btn-sm" onclick="clearLocal()">🗑️ Limpar Local</button>
-    </div>
+  <div class="cd set-section" style="border-color:rgba(196,92,92,0.25)">
+    <div class="cd-hdr"><div class="cd-title" style="color:var(--red)">⚠️ Dados</div></div>
+    <p class="tsm tm mb-12">Dados sincronizados na nuvem via Firebase. Exporte JSON para backup extra.</p>
+    <div class="flex gap-8 fw"><button class="btn btn-s btn-sm" onclick="doExport()">📥 Exportar</button><button class="btn btn-d btn-sm" onclick="clearAll()">🗑️ Limpar Tudo</button></div>
   </div>
 </div>
-</div><!-- /main-content -->
-
-<!-- ═══ RECIPE FORM MODAL ═══ -->
-<div class="modal-bg" id="recipeModal">
-  <div class="modal-sheet" id="recipeModalSheet">
-    <div class="flex justify-between items-center mb-20">
-      <div class="modal-title" id="modalTitle">Nova Receita</div>
-      <button class="btn-icon-sm" onclick="closeRecipeModal()">✕</button>
-    </div>
-
-    <!-- Basic info -->
-    <div class="card mb-16">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--accent-glow)">📝</div> Informações</div></div>
-      <div class="field"><label class="field-label">Nome da Receita</label><input class="field-input" id="fName" placeholder="Ex: Bolo de Chocolate"></div>
-      <div class="field-row field-row-2">
-        <div class="field"><label class="field-label">Rendimento</label><input class="field-input" id="fYield" placeholder="Ex: 20 unidades"></div>
-        <div class="field"><label class="field-label">Categoria</label>
-          <select class="field-select" id="fCategory">
-            <option>Doces</option><option>Salgados</option><option>Bolos</option>
-            <option>Pães</option><option>Tortas</option><option>Bebidas</option><option>Outros</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick import -->
-    <div class="card mb-16">
-      <div class="card-header">
-        <div class="card-title"><div class="card-title-icon" style="background:var(--info-bg)">⚡</div> Importação Rápida</div>
-        <span class="badge badge-info">Opcional</span>
-      </div>
-      <p class="text-sm text-muted mb-12">Cole o texto bruto da receita e o sistema separa ingredientes e modo de preparo automaticamente.</p>
-      <div class="field"><textarea class="field-textarea" id="fQuickImport" rows="4" placeholder="Cole a receita completa aqui..."></textarea></div>
-      <button class="btn btn-secondary btn-sm" onclick="parseImport()">🔄 Processar Texto</button>
-    </div>
-
-    <!-- Ingredients -->
-    <div class="card mb-16">
-      <div class="card-header">
-        <div class="card-title"><div class="card-title-icon" style="background:var(--success-bg)">🧂</div> Ingredientes</div>
-        <button class="btn btn-secondary btn-xs" onclick="addIngRow()">+ Novo</button>
-      </div>
-      <div id="ingRows"></div>
-    </div>
-
-    <!-- Instructions -->
-    <div class="card mb-16">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--warning-bg)">👩‍🍳</div> Modo de Preparo</div></div>
-      <div class="field"><textarea class="field-textarea" id="fInstructions" rows="6" placeholder="Escreva cada passo em uma linha..."></textarea></div>
-    </div>
-
-    <!-- Per-recipe: Energy -->
-    <div class="card mb-16">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--info-bg)">🔥</div> Energia / Gás</div></div>
-      <p class="text-sm text-muted mb-12">Esta receita utiliza forno ou fogão? O custo será calculado individualmente.</p>
-      <div class="field"><label class="field-label">Tipo de Uso</label>
-        <select class="field-select" id="fEnergy" onchange="toggleEnergyFields()">
-          <option value="nenhum">Nenhum — sem custo de energia</option>
-          <option value="forno_eletrico">Forno Elétrico</option>
-          <option value="forno_gas">Forno a Gás</option>
-          <option value="fogao">Fogão a Gás</option>
-          <option value="forno_eletrico_fogao">Forno Elétrico + Fogão</option>
-          <option value="forno_gas_fogao">Forno a Gás + Fogão</option>
-        </select>
-      </div>
-      <div id="energyFields" class="hidden">
-        <div class="field-row field-row-2">
-          <div class="field" id="wrapOvenTime"><label class="field-label">Tempo de Forno (min)</label><input class="field-input" type="number" id="fOvenTime" value="0" min="0"></div>
-          <div class="field" id="wrapStoveTime"><label class="field-label">Tempo de Fogão (min)</label><input class="field-input" type="number" id="fStoveTime" value="0" min="0"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Per-recipe: Packaging -->
-    <div class="card mb-16">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--accent-glow)">📦</div> Embalagem</div></div>
-      <p class="text-sm text-muted mb-12">Cada receita pode ter sua própria embalagem e custo.</p>
-      <div class="toggle-wrap mb-12">
-        <div class="toggle" id="fPkgToggle" onclick="this.classList.toggle('on');togglePkgFields()"></div>
-        <span class="toggle-label">Incluir embalagem nesta receita</span>
-      </div>
-      <div id="pkgFields" class="hidden">
-        <div class="field-row field-row-2">
-          <div class="field"><label class="field-label">Custo por Unidade (R$)</label><input class="field-input" type="number" step="0.01" id="fPkgCost" placeholder="1.50"></div>
-          <div class="field"><label class="field-label">Descrição</label><input class="field-input" id="fPkgDesc" placeholder="Ex: Caixa kraft + fita"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div class="card mb-20">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--bg-elevated)">📋</div> Observações</div></div>
-      <div class="field"><textarea class="field-textarea" id="fNotes" rows="3" placeholder="Dicas, variações..."></textarea></div>
-    </div>
-
-    <button class="btn btn-primary btn-full" onclick="saveRecipe()" style="padding:14px;font-size:1rem">💾 Salvar Receita</button>
-  </div>
 </div>
 
-<!-- ═══ TOAST ═══ -->
-<div class="toast" id="toast"></div>
+<!-- ═══ RECIPE MODAL ═══ -->
+<div class="mo-bg" id="rMo">
+<div class="mo" id="rMoS">
+  <div class="flex jb ac mb-20"><div class="mo-title" id="moTi">Nova Receita</div><button class="btn-ico" onclick="closeMo()">✕</button></div>
 
-<!-- ═══════════════════════════════════════════════════════════
-   APPLICATION LOGIC
-   ═══════════════════════════════════════════════════════════ -->
+  <div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--accent-light)">📝</div>Informações</div></div>
+    <div class="fld"><label class="fld-lbl">Nome</label><input class="fld-in" id="fN" placeholder="Ex: Bolo de Chocolate"></div>
+    <div class="row row-2"><div class="fld"><label class="fld-lbl">Rendimento</label><input class="fld-in" id="fY" placeholder="Ex: 20 unidades"></div><div class="fld"><label class="fld-lbl">Categoria</label><select class="fld-sel" id="fCat"><option>Doces</option><option>Salgados</option><option>Bolos</option><option>Pães</option><option>Tortas</option><option>Bebidas</option><option>Outros</option></select></div></div>
+  </div>
+
+  <div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--blue-bg)">⚡</div>Importação Rápida</div><span class="badge" style="background:var(--blue-bg);color:var(--blue)">Opcional</span></div>
+    <p class="tsm tm mb-8">Cole o texto bruto da receita — ingredientes e preparo são separados automaticamente.</p>
+    <div class="fld"><textarea class="fld-ta" id="fQI" rows="4" placeholder="Cole a receita completa aqui..."></textarea></div>
+    <button class="btn btn-s btn-sm mt-4" onclick="parseQI()">🔄 Processar</button>
+  </div>
+
+  <div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--green-bg)">🧂</div>Ingredientes</div><button class="btn btn-s btn-xs" onclick="addIR()">+ Novo</button></div><div id="iRows"></div></div>
+
+  <div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--accent-light)">👩‍🍳</div>Modo de Preparo</div></div>
+    <div class="fld"><textarea class="fld-ta" id="fIns" rows="5" placeholder="Cada passo em uma linha..."></textarea></div>
+  </div>
+
+  <div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--blue-bg)">🔥</div>Energia / Gás</div></div>
+    <p class="tsm tm mb-8">Se esta receita usa forno ou fogão, o custo é calculado automaticamente.</p>
+    <div class="fld"><label class="fld-lbl">Tipo</label><select class="fld-sel" id="fEn" onchange="togEn()"><option value="nenhum">Nenhum</option><option value="forno_eletrico">Forno Elétrico</option><option value="forno_gas">Forno a Gás</option><option value="fogao">Fogão</option><option value="forno_eletrico_fogao">Forno Elétrico + Fogão</option><option value="forno_gas_fogao">Forno a Gás + Fogão</option></select></div>
+    <div id="enFlds" class="dn"><div class="row row-2"><div class="fld" id="wOT"><label class="fld-lbl">Forno (min)</label><input class="fld-in" type="number" id="fOT" value="0" min="0"></div><div class="fld" id="wST"><label class="fld-lbl">Fogão (min)</label><input class="fld-in" type="number" id="fST" value="0" min="0"></div></div></div>
+  </div>
+
+  <div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--accent-light)">📦</div>Embalagem</div></div>
+    <p class="tsm tm mb-8">Cada receita pode ter sua embalagem e custo próprios.</p>
+    <div class="tgl-wrap mb-12"><div class="tgl" id="fPkT" onclick="this.classList.toggle('on');togPk()"></div><span class="tgl-txt">Incluir embalagem</span></div>
+    <div id="pkFlds" class="dn"><div class="row row-2"><div class="fld"><label class="fld-lbl">Custo/un (R$)</label><input class="fld-in" type="number" step="0.01" id="fPkC" placeholder="1.50"></div><div class="fld"><label class="fld-lbl">Descrição</label><input class="fld-in" id="fPkD" placeholder="Ex: Caixa kraft"></div></div></div>
+  </div>
+
+  <div class="cd mb-20"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--bg-warm)">📋</div>Observações</div></div>
+    <div class="fld"><textarea class="fld-ta" id="fNt" rows="2" placeholder="Dicas, variações..."></textarea></div>
+  </div>
+
+  <button class="btn btn-p btn-full" onclick="saveR()" style="padding:13px;font-size:0.95rem">💾 Salvar Receita</button>
+</div></div>
+
+<div class="tst" id="tst"></div>
+
 <script>
-// ─── DATA ───
-let DB = { recipes: {}, prices: {}, settings: defaults() };
-let fbApp = null, fbDb = null, fbRef = null, fbConnected = false;
-let editId = null, viewId = null;
+// ═══════════════════════════════════════════
+//  FIREBASE — HARDCODED CONFIG
+// ═══════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDh9VvnbEY8NKFReVZUgMm64-9rouujEC0",
+  authDomain: "receitas-93e66.firebaseapp.com",
+  databaseURL: "https://receitas-93e66-default-rtdb.firebaseio.com",
+  projectId: "receitas-93e66",
+  storageBucket: "receitas-93e66.firebasestorage.app",
+  messagingSenderId: "240852691694",
+  appId: "1:240852691694:web:bbaae0263f41dbd2c7e1ff"
+};
 
-function defaults() {
-  return { kwh:.75, ovenW:1500, gasPrice:110, gasH:60, txDeb:1.99, txCred:3.49, margin:200 };
-}
+let D = { recipes:{}, prices:{}, settings: defs() };
+let fbRef = null, editId = null, viewId = null;
 
-// ─── LOCAL PERSISTENCE ───
-function saveLocal() { localStorage.setItem('rp2', JSON.stringify(DB)); }
-function loadLocal() {
-  try { const d = JSON.parse(localStorage.getItem('rp2')); if(d) DB = {...DB,...d}; } catch{}
-}
+function defs(){ return {kwh:.75,ovenW:1500,gasPrice:110,gasH:60,txDeb:1.99,txCred:3.49,margin:200}; }
 
-// ─── FIREBASE ───
-function connectFirebase() {
-  const raw = document.getElementById('cfgFirebase').value.trim();
-  if(!raw){ toast('Cole o firebaseConfig','error'); return; }
+// ─── FIREBASE INIT ───
+function initFB(){
   try {
-    let cfg = raw;
-    // Handle if user pasted the whole const block
-    const m = raw.match(/\{[\s\S]*\}/);
-    if(m) cfg = m[0];
-    cfg = cfg.replace(/(['"])?(\w+)(['"])?\s*:/g, '"$2":').replace(/'/g,'"').replace(/,\s*}/g,'}');
-    const config = JSON.parse(cfg);
-    if(!config.databaseURL){ toast('Faltou o databaseURL no config','error'); return; }
-    localStorage.setItem('rp2_fb', JSON.stringify(config));
-    initFirebase(config);
-  } catch(e) { toast('Config inválido: '+e.message,'error'); }
+    const app = firebase.initializeApp(FIREBASE_CONFIG);
+    fbRef = app.database().ref('receitapro');
+    sync('syncing','Conectando...');
+    fbRef.on('value', s => {
+      const d = s.val();
+      if(d){ D.recipes=d.recipes||{}; D.prices=d.prices||{}; if(d.settings)D.settings={...defs(),...d.settings}; }
+      drawAll(); loadCfgUI();
+      sync('on','Sincronizado');
+    }, e => sync('off','Erro'));
+  } catch(e){ sync('off','Offline'); }
+}
+function push(){ if(fbRef) fbRef.set(D).catch(()=>{}); }
+function sync(s,t){
+  const b=document.getElementById('syncBadge'), l=document.getElementById('syncTxt');
+  l.textContent=t;
+  b.className = 'hdr-sync'+(s==='on'?'':' off');
+  b.querySelector('.dot').style.animation = s==='syncing'?'livePulse .6s infinite':'';
+  if(s==='on') b.querySelector('.dot').style.background='var(--green)';
+  else if(s==='syncing') b.querySelector('.dot').style.background='var(--accent)';
+  else b.querySelector('.dot').style.background='var(--text-light)';
 }
 
-function initFirebase(config) {
-  try {
-    if(fbApp) { fbApp.delete().catch(()=>{}); }
-    fbApp = firebase.initializeApp(config, 'rp_'+Date.now());
-    fbDb = fbApp.database();
-    fbRef = fbDb.ref('receitapro');
-    setSyncStatus('syncing','Conectando...');
-    // Listen for data
-    fbRef.on('value', snap => {
-      const data = snap.val();
-      if(data) {
-        DB.recipes = data.recipes || {};
-        DB.prices = data.prices || {};
-        if(data.settings) DB.settings = {...defaults(),...data.settings};
-      }
-      saveLocal();
-      renderAll();
-      setSyncStatus('online','Sincronizado');
-      fbConnected = true;
-      document.getElementById('fbBadge').textContent = 'Conectado';
-      document.getElementById('fbBadge').style.background = 'var(--success-bg)';
-      document.getElementById('fbBadge').style.color = 'var(--success)';
-    }, err => {
-      setSyncStatus('offline','Erro: '+err.message);
-      fbConnected = false;
-    });
-    toast('Firebase conectado!','success');
-  } catch(e) { toast('Erro ao conectar: '+e.message,'error'); }
-}
-
-function disconnectFirebase() {
-  if(fbRef) fbRef.off();
-  if(fbApp) fbApp.delete().catch(()=>{});
-  fbApp=null; fbDb=null; fbRef=null; fbConnected=false;
-  localStorage.removeItem('rp2_fb');
-  setSyncStatus('offline','Offline');
-  document.getElementById('fbBadge').textContent = 'Desconectado';
-  document.getElementById('fbBadge').style.background = '';
-  document.getElementById('fbBadge').style.color = '';
-  document.getElementById('cfgFirebase').value = '';
-  toast('Firebase desconectado','info');
-}
-
-function syncToCloud() {
-  if(!fbConnected||!fbRef) return;
-  setSyncStatus('syncing','Salvando...');
-  fbRef.set(DB).then(()=> setSyncStatus('online','Sincronizado'))
-    .catch(e=> setSyncStatus('offline','Erro sync'));
-}
-
-function setSyncStatus(state, label) {
-  const dot = document.getElementById('syncDot');
-  const lbl = document.getElementById('syncLabel');
-  dot.className = 'sync-dot ' + state;
-  lbl.textContent = label;
-}
-
-// ─── NAVIGATION ───
-function nav(page) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('pg-'+page).classList.add('active');
-  document.querySelectorAll('.nav-item,.sidebar-item').forEach(b=>{
-    b.classList.toggle('active', b.dataset.page===page);
-  });
-  document.getElementById('fabRecipe').classList.toggle('hidden', page!=='recipes');
-  if(page==='recipes') closeRecipeDetail();
-  if(page==='calculator') populateCalcSelect();
-  if(page==='settings') loadSettingsUI();
+// ─── NAV ───
+function go(p){
+  document.querySelectorAll('.pg').forEach(x=>x.classList.remove('on'));
+  document.getElementById('pg-'+p).classList.add('on');
+  document.querySelectorAll('.bnav-item,.side-btn').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  document.getElementById('fabR').classList.toggle('dn',p!=='recipes');
+  if(p==='recipes')closeDetail();
+  if(p==='calc')fillCalcSel();
+  if(p==='config')loadCfgUI();
 }
 
 // ─── TOAST ───
-function toast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast '+type+' show';
-  clearTimeout(t._to);
-  t._to = setTimeout(()=> t.classList.remove('show'), 2800);
-}
+function tst(m,t='ok'){const e=document.getElementById('tst');e.textContent=m;e.className='tst '+t+' show';clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2600);}
 
-// ─── UNIT SYSTEM ───
-const UNITS = {
-  g:{base:'g',f:1}, kg:{base:'g',f:1000}, mg:{base:'g',f:0.001},
-  ml:{base:'ml',f:1}, L:{base:'ml',f:1000}, l:{base:'ml',f:1000},
-  'xícara':{base:'ml',f:240}, 'col. sopa':{base:'ml',f:15}, 'col. chá':{base:'ml',f:5},
-  un:{base:'un',f:1}, dz:{base:'un',f:12}, pacote:{base:'pkt',f:1},
-  pitada:{base:'g',f:0.5}, 'a gosto':{base:'x',f:0}
-};
-function toBase(qty,unit){ const u=UNITS[unit]||UNITS[unit.toLowerCase()]; return u?{q:qty*u.f,b:u.base}:{q:qty,b:unit}; }
-function fmtQty(n){ if(!n)return'0'; if(n<0.01)return n.toFixed(3); if(n<1)return n.toFixed(2); return n%1===0?n.toString():n.toFixed(2); }
-function baseUnitLabel(u){ const m=UNITS[u]; if(!m)return u; return m.base==='g'?'g':m.base==='ml'?'ml':m.base==='un'?'un':u; }
+// ─── UNITS ───
+const U={g:{b:'g',f:1},kg:{b:'g',f:1000},mg:{b:'g',f:.001},ml:{b:'ml',f:1},L:{b:'ml',f:1000},l:{b:'ml',f:1000},'xícara':{b:'ml',f:240},'col. sopa':{b:'ml',f:15},'col. chá':{b:'ml',f:5},un:{b:'un',f:1},dz:{b:'un',f:12},pacote:{b:'pk',f:1},pitada:{b:'g',f:.5},'a gosto':{b:'x',f:0}};
+function tb(q,u){const x=U[u]||U[u.toLowerCase()];return x?{q:q*x.f,b:x.b}:{q,b:u};}
+function fq(n){if(!n)return'0';if(n<.01)return n.toFixed(3);if(n<1)return n.toFixed(2);return n%1===0?''+n:n.toFixed(2);}
+function bul(u){const x=U[u];return x?x.b==='g'?'g':x.b==='ml'?'ml':x.b==='un'?'un':u:u;}
+function convs(q,u){const b=tb(q,u),c=[];if(b.b==='g'){if(b.q>=1000)c.push(fq(b.q/1000)+' kg');c.push(fq(b.q)+' g');c.push(fq(b.q/240)+' xíc.');c.push(fq(b.q/15)+' col.s');}
+else if(b.b==='ml'){if(b.q>=1000)c.push(fq(b.q/1000)+' L');c.push(fq(b.q)+' ml');c.push(fq(b.q/240)+' xíc.');c.push(fq(b.q/15)+' col.s');}
+return c.filter(x=>!x.startsWith(fq(q)+' '+u));}
 
-function conversions(qty, unit) {
-  const b = toBase(qty, unit);
-  const c = [];
-  if(b.b==='g'){ if(b.q>=1000)c.push(fmtQty(b.q/1000)+' kg'); c.push(fmtQty(b.q)+' g'); c.push(fmtQty(b.q/240)+' xíc.'); c.push(fmtQty(b.q/15)+' col. sopa'); }
-  else if(b.b==='ml'){ if(b.q>=1000)c.push(fmtQty(b.q/1000)+' L'); c.push(fmtQty(b.q)+' ml'); c.push(fmtQty(b.q/240)+' xíc.'); c.push(fmtQty(b.q/15)+' col. sopa'); }
-  return c.filter(x=> !x.startsWith(fmtQty(qty)+' '+unit));
-}
+// ─── COST ───
+function findC(n,q,u){const nl=n.toLowerCase();let best=null;Object.values(D.prices).forEach(p=>{const pn=p.name.toLowerCase();if(pn===nl||nl.includes(pn)||pn.includes(nl)){if(!best||pn.length>best.name.length)best=p;}});if(!best)return 0;const pb=tb(best.qty,best.unit),ib=tb(q,u);return pb.b===ib.b&&pb.q>0?(best.price/pb.q)*ib.q:0;}
+function rCost(r){let t=0;(r.ingredients||[]).forEach(i=>t+=findC(i.name,i.qty,i.unit));return t;}
+function eCost(r){if(!r.energy||r.energy==='nenhum')return 0;const s=D.settings;let c=0;const e=r.energy;if(e.includes('forno_eletrico'))c+=(s.ovenW/1000)*((r.ovenTime||0)/60)*s.kwh;if(e.includes('forno_gas'))c+=((r.ovenTime||0)/60)*(s.gasPrice/s.gasH);if(e.includes('fogao'))c+=((r.stoveTime||0)/60)*(s.gasPrice/s.gasH);return c;}
 
-// ─── PRICE LOOKUP ───
-function findCost(ingName, ingQty, ingUnit) {
-  const n = ingName.toLowerCase();
-  let best = null;
-  Object.values(DB.prices).forEach(p => {
-    const pn = p.name.toLowerCase();
-    if(pn===n || n.includes(pn) || pn.includes(n)) {
-      if(!best || pn.length > best.name.length) best = p;
-    }
-  });
-  if(!best) return 0;
-  const pBase = toBase(best.qty, best.unit);
-  const iBase = toBase(ingQty, ingUnit);
-  if(pBase.b === iBase.b && pBase.q > 0) return (best.price / pBase.q) * iBase.q;
-  return 0;
-}
-
-function recipeCost(r) {
-  let t=0; (r.ingredients||[]).forEach(i=> t+=findCost(i.name,i.qty,i.unit)); return t;
-}
-
-function energyCost(r) {
-  if(!r.energy || r.energy==='nenhum') return 0;
-  const s = DB.settings; let c=0;
-  const e = r.energy;
-  if(e.includes('forno_eletrico')) { c += (s.ovenW/1000)*((r.ovenTime||0)/60)*s.kwh; }
-  if(e.includes('forno_gas')) { c += ((r.ovenTime||0)/60)*(s.gasPrice/s.gasH); }
-  if(e.includes('fogao')) { c += ((r.stoveTime||0)/60)*(s.gasPrice/s.gasH); }
-  return c;
-}
-
-// ─── RECIPES RENDER ───
-function renderRecipes() {
-  const arr = Object.entries(DB.recipes).sort((a,b)=>(b[1].updatedAt||'').localeCompare(a[1].updatedAt||''));
-  const q = (document.getElementById('searchRecipe').value||'').toLowerCase();
-  const filtered = arr.filter(([,r])=> r.name.toLowerCase().includes(q) || (r.category||'').toLowerCase().includes(q));
-
-  document.getElementById('recipeCountLabel').textContent = `${arr.length} receita${arr.length!==1?'s':''} cadastrada${arr.length!==1?'s':''}`;
-  const grid = document.getElementById('recipesGrid');
-
-  if(!filtered.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📖</div>
-      <h3>${arr.length?'Nenhum resultado':'Nenhuma receita ainda'}</h3>
-      <p>${arr.length?'Tente outra busca':'Toque no + para criar sua primeira receita'}</p>
-      ${!arr.length?'<button class="btn btn-primary" onclick="openRecipeModal()">+ Nova Receita</button>':''}
-    </div>`;
-    return;
-  }
-
-  grid.innerHTML = filtered.map(([id,r])=>{
-    const nIng = (r.ingredients||[]).length;
-    const cost = recipeCost(r);
-    return `<div class="recipe-card" data-cat="${esc(r.category||'Outros')}" onclick="viewRecipe('${id}')">
-      <div class="recipe-card-name">${esc(r.name)}</div>
-      ${r.yield?`<div class="recipe-card-yield">Rende: ${esc(r.yield)}</div>`:''}
-      <div class="recipe-card-footer">
-        <span class="badge badge-cat" style="background:var(--cat-${catKey(r.category)}-bg,var(--accent-glow));color:var(--cat-${catKey(r.category)},var(--accent))">${esc(r.category||'Outros')}</span>
-        <span class="recipe-stat">🧂 ${nIng}</span>
-        ${cost>0?`<span class="recipe-stat text-accent fw-600">R$ ${cost.toFixed(2)}</span>`:''}
-        ${r.packaging?.enabled?'<span class="recipe-stat">📦</span>':''}
-        ${r.energy&&r.energy!=='nenhum'?'<span class="recipe-stat">🔥</span>':''}
-      </div>
-    </div>`;
+// ═══ RECIPES RENDER ═══
+function drawR(){
+  const arr=Object.entries(D.recipes).sort((a,b)=>(b[1].updatedAt||'').localeCompare(a[1].updatedAt||''));
+  const q=(document.getElementById('sR').value||'').toLowerCase();
+  const f=arr.filter(([,r])=>r.name.toLowerCase().includes(q)||(r.category||'').toLowerCase().includes(q));
+  document.getElementById('rCount').textContent=arr.length+' receita'+(arr.length!==1?'s':'')+' cadastrada'+(arr.length!==1?'s':'');
+  const g=document.getElementById('rGrid');
+  if(!f.length){g.innerHTML=`<div class="emp" style="grid-column:1/-1"><div class="emp-ico">📖</div><h3>${arr.length?'Nenhum resultado':'Nenhuma receita ainda'}</h3><p>${arr.length?'Tente outra busca':'Toque no + para criar sua primeira'}</p>${!arr.length?'<button class="btn btn-p" onclick="openMo()">+ Nova Receita</button>':''}</div>`;return;}
+  g.innerHTML=f.map(([id,r])=>{const n=(r.ingredients||[]).length,c=rCost(r);
+    return`<div class="rc" data-c="${esc(r.category||'Outros')}" onclick="viewR('${id}')"><div class="rc-name">${esc(r.name)}</div>${r.yield?`<div class="rc-yield">Rende: ${esc(r.yield)}</div>`:''}<div class="rc-foot"><span class="rc-tag" style="background:var(--accent-light);color:var(--accent-text)">${esc(r.category||'Outros')}</span><span class="rc-stat">🧂 ${n}</span>${c>0?`<span class="rc-stat ta fw6">R$ ${c.toFixed(2)}</span>`:''}${r.packaging?.enabled?'<span class="rc-stat">📦</span>':''}${r.energy&&r.energy!=='nenhum'?'<span class="rc-stat">🔥</span>':''}</div></div>`;
   }).join('');
 }
 
-function catKey(c) { return (c||'outros').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-
-// ─── VIEW RECIPE ───
-function viewRecipe(id) {
-  const r = DB.recipes[id]; if(!r) return;
-  viewId = id;
-  document.getElementById('recipeListView').classList.add('hidden');
-  document.getElementById('fabRecipe').classList.add('hidden');
-  document.getElementById('recipeDetailView').classList.remove('hidden');
-  document.getElementById('btnEditRecipe').onclick = ()=> openRecipeModal(id);
-  document.getElementById('btnDeleteRecipe').onclick = ()=> deleteRecipe(id);
-
-  const iCost = recipeCost(r);
-  const eCost = energyCost(r);
-  const pkgCost = r.packaging?.enabled ? (r.packaging.cost||0) : 0;
-
-  // Parse yield number
-  let yieldNum = parseInt((r.yield||'').match(/\d+/)?.[0]) || 1;
-
-  const ingHtml = (r.ingredients||[]).map(i=>{
-    const c = findCost(i.name,i.qty,i.unit);
-    const cv = conversions(i.qty,i.unit);
-    return `<tr>
-      <td><span class="ing-name">${esc(i.name)}</span></td>
-      <td>${fmtQty(i.qty)} ${esc(i.unit)}</td>
-      <td class="text-sm text-muted">${cv.join(' · ')||'—'}</td>
-      <td class="${c>0?'ing-cost':'ing-cost none'}">${c>0?'R$ '+c.toFixed(2):'—'}</td>
-    </tr>`;
-  }).join('');
-
-  const steps = (r.instructions||'').split('\n').filter(s=>s.trim()).map((s,i)=>
-    `<div class="prep-step"><div class="step-num">${i+1}</div><div class="step-text">${esc(s.trim())}</div></div>`
-  ).join('');
-
-  const totalCost = iCost + eCost + (pkgCost * yieldNum);
-
-  document.getElementById('recipeDetailContent').innerHTML = `
-    <div class="recipe-hero">
-      <div class="recipe-hero-name">${esc(r.name)}</div>
-      ${r.yield?`<div class="recipe-hero-yield">📊 Rendimento: ${esc(r.yield)}</div>`:''}
-      <div class="flex gap-8 flex-wrap mt-12">
-        <span class="badge badge-accent">${esc(r.category||'Outros')}</span>
-        ${r.energy&&r.energy!=='nenhum'?`<span class="badge badge-info">🔥 ${energyLabel(r.energy)}</span>`:''}
-        ${r.packaging?.enabled?`<span class="badge badge-success">📦 ${esc(r.packaging.desc||'Embalagem')}</span>`:''}
-      </div>
-    </div>
-
-    <div class="card mb-16">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--success-bg)">🧂</div> Ingredientes</div></div>
-      <div style="overflow-x:auto">
-        <table class="ing-table">
-          <thead><tr><th>Ingrediente</th><th>Quantidade</th><th>Conversões</th><th>Custo</th></tr></thead>
-          <tbody>${ingHtml}</tbody>
-        </table>
-      </div>
-    </div>
-
-    ${steps?`<div class="card mb-16">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--warning-bg)">👩‍🍳</div> Modo de Preparo</div></div>
-      <div class="prep-steps">${steps}</div>
-    </div>`:''}
-
-    ${r.notes?`<div class="card mb-16">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--bg-elevated)">📋</div> Observações</div></div>
-      <p class="text-sm" style="line-height:1.8;color:var(--text-secondary)">${esc(r.notes).replace(/\n/g,'<br>')}</p>
-    </div>`:''}
-
-    <div class="cost-panel">
-      <div class="card-title mb-16" style="font-size:1rem"><div class="card-title-icon" style="background:var(--accent-glow)">💰</div> Resumo de Custos</div>
-      <div class="cost-row"><span class="label">Ingredientes</span><span class="val">R$ ${iCost.toFixed(2)}</span></div>
-      ${eCost>0?`<div class="cost-row"><span class="label">Energia / Gás</span><span class="val">R$ ${eCost.toFixed(2)}</span></div>`:''}
-      ${r.packaging?.enabled?`<div class="cost-row"><span class="label">Embalagem (${yieldNum}× R$ ${pkgCost.toFixed(2)})</span><span class="val">R$ ${(pkgCost*yieldNum).toFixed(2)}</span></div>`:''}
-      <div class="cost-total cost-row"><span class="label">Custo Total</span><span class="val">R$ ${totalCost.toFixed(2)}</span></div>
-      ${yieldNum>1?`<div class="cost-unit-price">Custo por unidade: <strong>R$ ${(totalCost/yieldNum).toFixed(2)}</strong></div>`:''}
-    </div>
-  `;
+// ═══ VIEW RECIPE ═══
+function viewR(id){
+  const r=D.recipes[id];if(!r)return;viewId=id;
+  document.getElementById('vList').classList.add('dn');document.getElementById('fabR').classList.add('dn');
+  const v=document.getElementById('vDetail');v.classList.remove('dn');
+  const ic=rCost(r),ec=eCost(r),pk=r.packaging?.enabled?(r.packaging.cost||0):0;
+  let yn=parseInt((r.yield||'').match(/\d+/)?.[0])||1;
+  const total=ic+ec+(pk*yn);
+  const iH=(r.ingredients||[]).map(i=>{const c=findC(i.name,i.qty,i.unit),cv=convs(i.qty,i.unit);return`<tr><td><strong>${esc(i.name)}</strong></td><td>${fq(i.qty)} ${esc(i.unit)}</td><td class="tsm tm">${cv.join(' · ')||'—'}</td><td class="${c>0?'ta fw6':'tm'}">${c>0?'R$ '+c.toFixed(2):'—'}</td></tr>`;}).join('');
+  const sH=(r.instructions||'').split('\n').filter(s=>s.trim()).map((s,i)=>`<div class="stp"><div class="stp-n">${i+1}</div><div class="stp-t">${esc(s.trim())}</div></div>`).join('');
+  const eL={forno_eletrico:'Forno Elétrico',forno_gas:'Forno a Gás',fogao:'Fogão',forno_eletrico_fogao:'Forno + Fogão',forno_gas_fogao:'Forno Gás + Fogão'};
+  v.innerHTML=`<div class="flex jb ac fw gap-8 mb-20"><button class="btn btn-g btn-sm" onclick="closeDetail()">← Voltar</button><div class="flex gap-6"><button class="btn btn-s btn-sm" onclick="openMo('${id}')">✏️ Editar</button><button class="btn btn-d btn-sm" onclick="delR('${id}')">🗑️</button></div></div>
+    <div class="r-hero"><div class="r-hero-name">${esc(r.name)}</div>${r.yield?`<div class="r-hero-sub">📊 Rendimento: ${esc(r.yield)}</div>`:''}<div class="flex gap-8 fw mt-12"><span class="badge" style="background:var(--accent-light);color:var(--accent-text)">${esc(r.category||'Outros')}</span>${r.energy&&r.energy!=='nenhum'?`<span class="badge" style="background:var(--blue-bg);color:var(--blue)">🔥 ${eL[r.energy]||r.energy}</span>`:''}${r.packaging?.enabled?`<span class="badge" style="background:var(--green-bg);color:var(--green)">📦 ${esc(r.packaging.desc||'Embalagem')}</span>`:''}</div></div>
+    <div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--green-bg)">🧂</div>Ingredientes</div></div><div style="overflow-x:auto"><table class="it"><thead><tr><th>Ingrediente</th><th>Qtd</th><th>Conversões</th><th>Custo</th></tr></thead><tbody>${iH}</tbody></table></div></div>
+    ${sH?`<div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--accent-light)">👩‍🍳</div>Modo de Preparo</div></div>${sH}</div>`:''}
+    ${r.notes?`<div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--bg-warm)">📋</div>Observações</div></div><p class="tsm" style="line-height:1.8;color:var(--text-secondary)">${esc(r.notes).replace(/\n/g,'<br>')}</p></div>`:''}
+    <div class="cp"><div class="cd-title mb-16" style="font-size:.95rem"><div class="cd-ico" style="background:var(--accent-light)">💰</div>Resumo de Custos</div>
+      <div class="cp-row"><span class="l">Ingredientes</span><span class="v">R$ ${ic.toFixed(2)}</span></div>
+      ${ec>0?`<div class="cp-row"><span class="l">Energia / Gás</span><span class="v">R$ ${ec.toFixed(2)}</span></div>`:''}
+      ${r.packaging?.enabled?`<div class="cp-row"><span class="l">Embalagem (${yn}× R$ ${pk.toFixed(2)})</span><span class="v">R$ ${(pk*yn).toFixed(2)}</span></div>`:''}
+      <div class="cp-total cp-row"><span class="l">Custo Total</span><span class="v">R$ ${total.toFixed(2)}</span></div>
+      ${yn>1?`<div class="cp-unit">Por unidade: <strong>R$ ${(total/yn).toFixed(2)}</strong></div>`:''}
+    </div>`;
 }
+function closeDetail(){document.getElementById('vDetail').classList.add('dn');document.getElementById('vList').classList.remove('dn');document.getElementById('fabR').classList.remove('dn');viewId=null;drawR();}
+function delR(id){if(!confirm('Excluir esta receita?'))return;delete D.recipes[id];push();closeDetail();tst('Receita excluída','err');}
 
-function energyLabel(e) {
-  const m = { forno_eletrico:'Forno Elétrico', forno_gas:'Forno a Gás', fogao:'Fogão', forno_eletrico_fogao:'Forno + Fogão', forno_gas_fogao:'Forno Gás + Fogão' };
-  return m[e]||e;
-}
-
-function closeRecipeDetail() {
-  document.getElementById('recipeDetailView').classList.add('hidden');
-  document.getElementById('recipeListView').classList.remove('hidden');
-  document.getElementById('fabRecipe').classList.remove('hidden');
-  viewId = null;
-  renderRecipes();
-}
-
-function deleteRecipe(id) {
-  if(!confirm('Excluir esta receita permanentemente?')) return;
-  delete DB.recipes[id]; saveLocal(); syncToCloud();
-  closeRecipeDetail(); toast('Receita excluída','error');
-}
-
-// ─── RECIPE MODAL ───
-function openRecipeModal(id=null) {
-  editId = id;
-  document.getElementById('recipeModal').classList.add('open');
-  document.getElementById('modalTitle').textContent = id ? 'Editar Receita' : 'Nova Receita';
-
-  if(id) {
-    const r = DB.recipes[id];
-    document.getElementById('fName').value = r.name||'';
-    document.getElementById('fYield').value = r.yield||'';
-    document.getElementById('fCategory').value = r.category||'Doces';
-    document.getElementById('fInstructions').value = r.instructions||'';
-    document.getElementById('fEnergy').value = r.energy||'nenhum';
-    document.getElementById('fOvenTime').value = r.ovenTime||0;
-    document.getElementById('fStoveTime').value = r.stoveTime||0;
-    document.getElementById('fNotes').value = r.notes||'';
-    // Packaging
-    const pkg = r.packaging||{};
-    const pkgOn = pkg.enabled||false;
-    document.getElementById('fPkgToggle').classList.toggle('on', pkgOn);
-    document.getElementById('fPkgCost').value = pkg.cost||'';
-    document.getElementById('fPkgDesc').value = pkg.desc||'';
-    togglePkgFields();
-    toggleEnergyFields();
-    renderIngRows(r.ingredients||[{name:'',qty:'',unit:'g'}]);
+// ═══ MODAL ═══
+function openMo(id=null){
+  editId=id;document.getElementById('rMo').classList.add('on');
+  document.getElementById('moTi').textContent=id?'Editar Receita':'Nova Receita';
+  if(id){const r=D.recipes[id];document.getElementById('fN').value=r.name||'';document.getElementById('fY').value=r.yield||'';document.getElementById('fCat').value=r.category||'Doces';document.getElementById('fIns').value=r.instructions||'';document.getElementById('fEn').value=r.energy||'nenhum';document.getElementById('fOT').value=r.ovenTime||0;document.getElementById('fST').value=r.stoveTime||0;document.getElementById('fNt').value=r.notes||'';
+    const pk=r.packaging||{};document.getElementById('fPkT').classList.toggle('on',!!pk.enabled);document.getElementById('fPkC').value=pk.cost||'';document.getElementById('fPkD').value=pk.desc||'';
+    togPk();togEn();drawIR(r.ingredients||[{name:'',qty:'',unit:'g'}]);
   } else {
-    ['fName','fYield','fInstructions','fNotes','fQuickImport','fPkgCost','fPkgDesc'].forEach(x=>document.getElementById(x).value='');
-    document.getElementById('fCategory').value='Doces';
-    document.getElementById('fEnergy').value='nenhum';
-    document.getElementById('fOvenTime').value=0;
-    document.getElementById('fStoveTime').value=0;
-    document.getElementById('fPkgToggle').classList.remove('on');
-    togglePkgFields(); toggleEnergyFields();
-    renderIngRows([{name:'',qty:'',unit:'g'}]);
+    ['fN','fY','fIns','fNt','fQI','fPkC','fPkD'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('fCat').value='Doces';document.getElementById('fEn').value='nenhum';
+    document.getElementById('fOT').value=0;document.getElementById('fST').value=0;
+    document.getElementById('fPkT').classList.remove('on');togPk();togEn();
+    drawIR([{name:'',qty:'',unit:'g'}]);
   }
-  // Scroll modal to top
-  document.getElementById('recipeModalSheet').scrollTop = 0;
+  document.getElementById('rMoS').scrollTop=0;
+}
+function closeMo(){document.getElementById('rMo').classList.remove('on');editId=null;}
+
+const UOPTS=['g','kg','mg','ml','L','un','dz','xícara','col. sopa','col. chá','pitada','pacote','a gosto'].map(u=>`<option value="${u}">${u}</option>`).join('');
+function drawIR(ings){document.getElementById('iRows').innerHTML=ings.map(i=>`<div class="ifr"><input class="fld-in" placeholder="Ingrediente" value="${esc(i.name||'')}" data-f="n"><input class="fld-in" type="number" step="0.01" placeholder="Qtd" value="${i.qty||''}" data-f="q"><select class="fld-sel" data-f="u">${UOPTS.replace(`"${i.unit||'g'}"`,`"${i.unit||'g'}" selected`)}</select><button class="btn-ico del" onclick="this.closest('.ifr').remove()">✕</button></div>`).join('');}
+function addIR(){const c=document.getElementById('iRows'),d=document.createElement('div');d.className='ifr';d.innerHTML=`<input class="fld-in" placeholder="Ingrediente" data-f="n"><input class="fld-in" type="number" step="0.01" placeholder="Qtd" data-f="q"><select class="fld-sel" data-f="u">${UOPTS}</select><button class="btn-ico del" onclick="this.closest('.ifr').remove()">✕</button>`;c.appendChild(d);d.querySelector('input').focus();}
+function getIngs(){const out=[];document.querySelectorAll('#iRows .ifr').forEach(r=>{const n=r.querySelector('[data-f="n"]').value.trim(),q=parseFloat(r.querySelector('[data-f="q"]').value)||0,u=r.querySelector('[data-f="u"]').value;if(n)out.push({name:n,qty:q,unit:u});});return out;}
+
+function togEn(){const v=document.getElementById('fEn').value;document.getElementById('enFlds').classList.toggle('dn',v==='nenhum');document.getElementById('wOT').classList.toggle('dn',!v.includes('forno'));document.getElementById('wST').classList.toggle('dn',!v.includes('fogao'));}
+function togPk(){document.getElementById('pkFlds').classList.toggle('dn',!document.getElementById('fPkT').classList.contains('on'));}
+
+function saveR(){
+  const name=document.getElementById('fN').value.trim();if(!name){tst('Informe o nome','err');return;}
+  const id=editId||'r_'+Date.now(),ex=D.recipes[id]||{};
+  D.recipes[id]={name,yield:document.getElementById('fY').value.trim(),category:document.getElementById('fCat').value,ingredients:getIngs(),instructions:document.getElementById('fIns').value.trim(),energy:document.getElementById('fEn').value,ovenTime:parseInt(document.getElementById('fOT').value)||0,stoveTime:parseInt(document.getElementById('fST').value)||0,packaging:{enabled:document.getElementById('fPkT').classList.contains('on'),cost:parseFloat(document.getElementById('fPkC').value)||0,desc:document.getElementById('fPkD').value.trim()},notes:document.getElementById('fNt').value.trim(),createdAt:ex.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+  push();closeMo();if(viewId===id)viewR(id);else drawR();tst(editId?'Atualizada!':'Salva!');
 }
 
-function closeRecipeModal() {
-  document.getElementById('recipeModal').classList.remove('open');
-  editId = null;
+// ─── QUICK IMPORT ───
+function parseQI(){
+  const raw=document.getElementById('fQI').value.trim();if(!raw){tst('Cole o texto','err');return;}
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean),ings=[],steps=[];let inS=false;
+  const iRx=/^[-•·*]?\s*(\d+[.,]?\d*)\s*(g|kg|mg|ml|l|litro|litros|xícara|xíc\.?|xic|cup|col\.?\s*sopa|col\.?\s*chá|col\.?|cs|cc|un|unidade|unidades|dz|dúzia|duzia|pacote|pitada)\s+(?:de\s+)?(.+)$/i;
+  const mRx=/^(modo de preparo|preparo|como fazer|instru|passo a passo|método)/i;
+  for(const line of lines){if(mRx.test(line)){inS=true;continue;}if(/^ingrediente/i.test(line))continue;
+    if(!inS){const m=line.match(iRx);if(m){ings.push({name:m[3].trim(),qty:parseFloat(m[1].replace(',','.')),unit:nU(m[2])});continue;}if(ings.length>0){inS=true;steps.push(line.replace(/^\d+[.)]\s*/,'').replace(/^[-•·*]\s*/,''));}else if(!document.getElementById('fN').value&&line.length<60)document.getElementById('fN').value=line;}
+    else steps.push(line.replace(/^\d+[.)]\s*/,'').replace(/^[-•·*]\s*/,''));}
+  if(ings.length){drawIR(ings);tst(ings.length+' ingredientes!');}if(steps.length)document.getElementById('fIns').value=steps.join('\n');
+}
+function nU(u){u=u.trim().toLowerCase();if(['l','litro','litros'].includes(u))return'L';if(['xícara','xíc','xíc.','xic','cup'].includes(u))return'xícara';if(['col. sopa','col sopa','cs','colher'].includes(u))return'col. sopa';if(['col. chá','col cha','cc'].includes(u))return'col. chá';if(['un','unidade','unidades'].includes(u))return'un';if(['dz','dúzia','duzia'].includes(u))return'dz';return u;}
+
+// ═══ PRICES ═══
+function drawP(){
+  const arr=Object.entries(D.prices).sort((a,b)=>a[1].name.localeCompare(b[1].name));
+  const q=(document.getElementById('sP').value||'').toLowerCase();
+  const f=arr.filter(([,p])=>p.name.toLowerCase().includes(q)||(p.brand||'').toLowerCase().includes(q));
+  const c=document.getElementById('pBox');
+  if(!f.length){c.innerHTML=`<div class="emp"><div class="emp-ico">🏷️</div><h3>Nenhum produto</h3><p>Adicione ingredientes acima</p></div>`;return;}
+  c.innerHTML=`<div class="cd">${f.map(([id,p])=>{const bp=tb(p.qty,p.unit),pu=bp.q>0?(p.price/bp.q):0;return`<div class="pr"><div class="pr-i"><div class="pr-n">${esc(p.name)}</div>${p.brand?`<div class="pr-b">${esc(p.brand)}</div>`:''}</div><div style="text-align:center;min-width:70px"><div class="txs tm">${p.qty} ${p.unit}</div></div><div class="pr-d"><div class="pr-v">R$ ${p.price.toFixed(2)}</div><div class="pr-u">R$ ${pu.toFixed(4)}/${bul(p.unit)}</div></div><button class="btn-ico del" style="margin-left:8px" onclick="delP('${id}')">✕</button></div>`;}).join('')}</div>`;
+}
+function addP(){const n=document.getElementById('pN').value.trim(),v=parseFloat(document.getElementById('pV').value),q=parseFloat(document.getElementById('pQ').value),u=document.getElementById('pU').value,b=document.getElementById('pB').value.trim();if(!n){tst('Nome','err');return;}if(!v||v<=0){tst('Preço','err');return;}if(!q||q<=0){tst('Quantidade','err');return;}D.prices['p_'+Date.now()]={name:n,brand:b,price:v,qty:q,unit:u};push();drawP();['pN','pB','pV','pQ'].forEach(x=>document.getElementById(x).value='');tst('Adicionado!');}
+function delP(id){if(!confirm('Excluir?'))return;delete D.prices[id];push();drawP();tst('Removido','err');}
+
+// ═══ CALCULATOR ═══
+function fillCalcSel(){const s=document.getElementById('cSel'),v=s.value;s.innerHTML='<option value="">— Selecione —</option>'+Object.entries(D.recipes).map(([id,r])=>`<option value="${id}">${esc(r.name)}</option>`).join('');s.value=v;document.getElementById('cMar').value=D.settings.margin;}
+function calc(){
+  const id=document.getElementById('cSel').value,o=document.getElementById('cOut');if(!id){o.innerHTML='';return;}
+  const r=D.recipes[id];if(!r){o.innerHTML='';return;}
+  const mar=parseFloat(document.getElementById('cMar').value)||0,yn=parseInt(document.getElementById('cYld').value)||1,s=D.settings;
+  const ic=rCost(r),ec=eCost(r),pk=r.packaging?.enabled?((r.packaging.cost||0)*yn):0;
+  const sub=ic+ec+pk,sell=sub*(1+mar/100),prof=sell-sub,pu=sell/yn;
+  const useMaq=document.getElementById('cMaq').classList.contains('on');
+  const td=sell*(s.txDeb/100),tc=sell*(s.txCred/100);
+  const iD=(r.ingredients||[]).map(i=>{const c=findC(i.name,i.qty,i.unit);return`<div class="cp-row"><span class="l">${esc(i.name)} <span class="txs tm">(${fq(i.qty)} ${i.unit})</span></span><span class="v">${c>0?'R$ '+c.toFixed(2):'<span class="tm">—</span>'}</span></div>`;}).join('');
+  const eL={forno_eletrico:'Forno Elétrico',forno_gas:'Forno a Gás',fogao:'Fogão',forno_eletrico_fogao:'Forno + Fogão',forno_gas_fogao:'Forno Gás + Fogão'};
+  o.innerHTML=`<div class="cd mb-12"><div class="cd-hdr"><div class="cd-title"><div class="cd-ico" style="background:var(--green-bg)">📝</div>${esc(r.name)}</div></div>${iD}</div>
+    <div class="cp"><div class="cd-title mb-16" style="font-size:.95rem"><div class="cd-ico" style="background:var(--accent-light)">💰</div>Precificação</div>
+      <div class="cp-row"><span class="l">Ingredientes</span><span class="v">R$ ${ic.toFixed(2)}</span></div>
+      ${ec>0?`<div class="cp-row"><span class="l">Energia / Gás</span><span class="v">R$ ${ec.toFixed(2)}</span></div>`:''}
+      ${pk>0?`<div class="cp-row"><span class="l">Embalagem (${yn}× R$ ${(r.packaging.cost||0).toFixed(2)})</span><span class="v">R$ ${pk.toFixed(2)}</span></div>`:''}
+      <div class="cp-div"></div>
+      <div class="cp-row"><span class="l fw6">Custo Total</span><span class="v fw7">R$ ${sub.toFixed(2)}</span></div>
+      <div class="cp-row"><span class="l">Margem (${mar}%)</span><span class="v ta">+ R$ ${prof.toFixed(2)}</span></div>
+      <div class="cp-total cp-row"><span class="l">Preço de Venda</span><span class="v">R$ ${sell.toFixed(2)}</span></div>
+      ${yn>1?`<div class="cp-unit">Por unidade: <strong>R$ ${pu.toFixed(2)}</strong></div>`:''}
+      ${useMaq?`<div class="cp-sec mt-16">💳 Com Maquininha</div>
+      <div class="cp-row"><span class="l">Débito (${s.txDeb}%)</span><span class="v">R$ ${(sell+td).toFixed(2)} <span class="txs tm">+${td.toFixed(2)}</span></span></div>
+      <div class="cp-row"><span class="l">Crédito (${s.txCred}%)</span><span class="v">R$ ${(sell+tc).toFixed(2)} <span class="txs tm">+${tc.toFixed(2)}</span></span></div>
+      ${yn>1?`<div class="cp-sec">Por Unidade (c/ taxa)</div><div class="cp-row"><span class="l">Débito</span><span class="v">R$ ${((sell+td)/yn).toFixed(2)}</span></div><div class="cp-row"><span class="l">Crédito</span><span class="v">R$ ${((sell+tc)/yn).toFixed(2)}</span></div>`:''}`:''}</div>`;
 }
 
-function renderIngRows(ings) {
-  const c = document.getElementById('ingRows');
-  const unitOpts = ['g','kg','mg','ml','L','un','dz','xícara','col. sopa','col. chá','pitada','pacote','a gosto']
-    .map(u=>`<option value="${u}">${u}</option>`).join('');
-  c.innerHTML = ings.map((ing,i)=>`
-    <div class="ing-form-row">
-      <input class="field-input" placeholder="Ingrediente" value="${esc(ing.name||'')}" data-f="name">
-      <input class="field-input" type="number" step="0.01" placeholder="Qtd" value="${ing.qty||''}" data-f="qty">
-      <select class="field-select" data-f="unit">${unitOpts.replace(`value="${ing.unit||'g'}"`,`value="${ing.unit||'g'}" selected`)}</select>
-      <button class="btn-icon-sm danger" onclick="this.closest('.ing-form-row').remove()">✕</button>
-    </div>
-  `).join('');
-}
+// ═══ SETTINGS ═══
+function loadCfgUI(){const s=D.settings;document.getElementById('sKwh').value=s.kwh;document.getElementById('sOW').value=s.ovenW;document.getElementById('sGas').value=s.gasPrice;document.getElementById('sGH').value=s.gasH;document.getElementById('sTD').value=s.txDeb;document.getElementById('sTC').value=s.txCred;document.getElementById('sMar').value=s.margin;}
+function saveCfg(){D.settings={kwh:parseFloat(document.getElementById('sKwh').value)||.75,ovenW:parseFloat(document.getElementById('sOW').value)||1500,gasPrice:parseFloat(document.getElementById('sGas').value)||110,gasH:parseFloat(document.getElementById('sGH').value)||60,txDeb:parseFloat(document.getElementById('sTD').value)||1.99,txCred:parseFloat(document.getElementById('sTC').value)||3.49,margin:parseFloat(document.getElementById('sMar').value)||200};push();}
 
-function addIngRow() {
-  const c = document.getElementById('ingRows');
-  const unitOpts = ['g','kg','mg','ml','L','un','dz','xícara','col. sopa','col. chá','pitada','pacote','a gosto']
-    .map(u=>`<option value="${u}">${u}</option>`).join('');
-  const d = document.createElement('div'); d.className='ing-form-row';
-  d.innerHTML=`<input class="field-input" placeholder="Ingrediente" data-f="name"><input class="field-input" type="number" step="0.01" placeholder="Qtd" data-f="qty"><select class="field-select" data-f="unit">${unitOpts}</select><button class="btn-icon-sm danger" onclick="this.closest('.ing-form-row').remove()">✕</button>`;
-  c.appendChild(d); d.querySelector('input').focus();
-}
+// ═══ IMPORT/EXPORT ═══
+function doExport(){const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='receitapro_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);tst('Exportado!');}
+function doImport(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.recipes)D.recipes={...D.recipes,...d.recipes};if(d.prices)D.prices={...D.prices,...d.prices};if(d.settings)D.settings={...defs(),...d.settings};push();drawAll();loadCfgUI();tst('Importado!');}catch{tst('Inválido','err');}};r.readAsText(f);e.target.value='';}
+function clearAll(){if(!confirm('⚠️ Apagar TUDO? (inclui a nuvem)'))return;if(!confirm('Tem certeza?'))return;D={recipes:{},prices:{},settings:defs()};push();drawAll();loadCfgUI();tst('Limpo','err');}
 
-function collectIngs() {
-  const rows = document.querySelectorAll('#ingRows .ing-form-row');
-  const out = [];
-  rows.forEach(r=>{
-    const name = r.querySelector('[data-f="name"]').value.trim();
-    const qty = parseFloat(r.querySelector('[data-f="qty"]').value)||0;
-    const unit = r.querySelector('[data-f="unit"]').value;
-    if(name) out.push({name,qty,unit});
-  });
-  return out;
-}
-
-function toggleEnergyFields() {
-  const v = document.getElementById('fEnergy').value;
-  const show = v !== 'nenhum';
-  document.getElementById('energyFields').classList.toggle('hidden', !show);
-  document.getElementById('wrapOvenTime').classList.toggle('hidden', !v.includes('forno'));
-  document.getElementById('wrapStoveTime').classList.toggle('hidden', !v.includes('fogao'));
-}
-
-function togglePkgFields() {
-  const on = document.getElementById('fPkgToggle').classList.contains('on');
-  document.getElementById('pkgFields').classList.toggle('hidden', !on);
-}
-
-function saveRecipe() {
-  const name = document.getElementById('fName').value.trim();
-  if(!name){ toast('Informe o nome da receita','error'); return; }
-  const id = editId || 'r_'+Date.now();
-  const existing = DB.recipes[id] || {};
-  const pkgOn = document.getElementById('fPkgToggle').classList.contains('on');
-
-  DB.recipes[id] = {
-    name,
-    yield: document.getElementById('fYield').value.trim(),
-    category: document.getElementById('fCategory').value,
-    ingredients: collectIngs(),
-    instructions: document.getElementById('fInstructions').value.trim(),
-    energy: document.getElementById('fEnergy').value,
-    ovenTime: parseInt(document.getElementById('fOvenTime').value)||0,
-    stoveTime: parseInt(document.getElementById('fStoveTime').value)||0,
-    packaging: {
-      enabled: pkgOn,
-      cost: parseFloat(document.getElementById('fPkgCost').value)||0,
-      desc: document.getElementById('fPkgDesc').value.trim()
-    },
-    notes: document.getElementById('fNotes').value.trim(),
-    createdAt: existing.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
-  saveLocal(); syncToCloud();
-  closeRecipeModal();
-  if(viewId===id) viewRecipe(id); else renderRecipes();
-  toast(editId?'Receita atualizada!':'Receita salva!');
-}
-
-// ─── QUICK IMPORT PARSER ───
-function parseImport() {
-  const raw = document.getElementById('fQuickImport').value.trim();
-  if(!raw){toast('Cole o texto primeiro','error');return;}
-  const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
-  const ings=[], steps=[];
-  let inSteps=false;
-
-  const iRx = /^[-•·*]?\s*(\d+[.,]?\d*)\s*(g|kg|mg|ml|l|litro|litros|xícara|xíc\.?|xic|cup|col\.?\s*sopa|col\.?\s*chá|col\.?|cs|cc|un|unidade|unidades|dz|dúzia|duzia|pacote|pitada)\s+(?:de\s+)?(.+)$/i;
-  const modeRx = /^(modo de preparo|preparo|como fazer|instru[çc][õo]es|passo a passo|m[ée]todo)/i;
-
-  for(const line of lines){
-    if(modeRx.test(line)){inSteps=true;continue;}
-    if(/^ingrediente/i.test(line))continue;
-    if(!inSteps){
-      const m=line.match(iRx);
-      if(m){ ings.push({name:m[3].trim(),qty:parseFloat(m[1].replace(',','.')),unit:normUnit(m[2])}); continue; }
-      if(ings.length>0){inSteps=true;steps.push(line.replace(/^\d+[.)]\s*/,'').replace(/^[-•·*]\s*/,''));}
-      else if(!document.getElementById('fName').value && line.length<60) document.getElementById('fName').value=line;
-    } else {
-      steps.push(line.replace(/^\d+[.)]\s*/,'').replace(/^[-•·*]\s*/,''));
-    }
-  }
-  if(ings.length){ renderIngRows(ings); toast(ings.length+' ingredientes encontrados'); }
-  if(steps.length) document.getElementById('fInstructions').value=steps.join('\n');
-}
-function normUnit(u){
-  u=u.trim().toLowerCase();
-  if(['l','litro','litros'].includes(u))return'L';
-  if(['xícara','xíc','xíc.','xic','cup'].includes(u))return'xícara';
-  if(['col. sopa','col sopa','cs','colher'].includes(u))return'col. sopa';
-  if(['col. chá','col cha','cc'].includes(u))return'col. chá';
-  if(['un','unidade','unidades'].includes(u))return'un';
-  if(['dz','dúzia','duzia'].includes(u))return'dz';
-  return u;
-}
-
-// ─── PRICES ───
-function renderPrices() {
-  const arr = Object.entries(DB.prices).sort((a,b)=>a[1].name.localeCompare(b[1].name));
-  const q = (document.getElementById('searchPrice').value||'').toLowerCase();
-  const f = arr.filter(([,p])=>p.name.toLowerCase().includes(q)||(p.brand||'').toLowerCase().includes(q));
-  const c = document.getElementById('pricesContainer');
-
-  if(!f.length) {
-    c.innerHTML = `<div class="empty"><div class="empty-icon">🏷️</div>
-      <h3>Nenhum produto</h3><p>Adicione ingredientes e preços no formulário acima</p></div>`;
-    return;
-  }
-
-  c.innerHTML = `<div class="card">${f.map(([id,p])=>{
-    const bp = toBase(p.qty,p.unit);
-    const perUnit = bp.q>0?(p.price/bp.q):0;
-    const bu = baseUnitLabel(p.unit);
-    return `<div class="price-row">
-      <div class="price-info">
-        <div class="price-name">${esc(p.name)}</div>
-        ${p.brand?`<div class="price-brand">${esc(p.brand)}</div>`:''}
-      </div>
-      <div style="text-align:center;min-width:80px"><div class="text-sm text-muted">${p.qty} ${p.unit}</div></div>
-      <div class="price-detail">
-        <div class="price-value">R$ ${p.price.toFixed(2)}</div>
-        <div class="price-unit">R$ ${perUnit.toFixed(4)}/${bu}</div>
-      </div>
-      <button class="btn-icon-sm danger" style="margin-left:8px" onclick="delPrice('${id}')">✕</button>
-    </div>`;
-  }).join('')}</div>`;
-}
-
-function addPrice() {
-  const name=document.getElementById('prName').value.trim();
-  const price=parseFloat(document.getElementById('prPrice').value);
-  const qty=parseFloat(document.getElementById('prQty').value);
-  const unit=document.getElementById('prUnit').value;
-  const brand=document.getElementById('prBrand').value.trim();
-  if(!name){toast('Informe o nome','error');return;}
-  if(!price||price<=0){toast('Informe o preço','error');return;}
-  if(!qty||qty<=0){toast('Informe a quantidade','error');return;}
-
-  const id='p_'+Date.now();
-  DB.prices[id]={name,brand,price,qty,unit,createdAt:new Date().toISOString()};
-  saveLocal(); syncToCloud(); renderPrices();
-  ['prName','prBrand','prPrice','prQty'].forEach(x=>document.getElementById(x).value='');
-  toast('Produto adicionado!');
-}
-function delPrice(id){
-  if(!confirm('Excluir este produto?'))return;
-  delete DB.prices[id]; saveLocal(); syncToCloud(); renderPrices(); toast('Removido','error');
-}
-
-// ─── CALCULATOR ───
-function populateCalcSelect() {
-  const sel = document.getElementById('calcRecipeSelect');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">— Selecione uma receita —</option>' +
-    Object.entries(DB.recipes).map(([id,r])=>`<option value="${id}">${esc(r.name)}</option>`).join('');
-  sel.value = cur;
-  document.getElementById('calcMargin').value = DB.settings.margin;
-}
-
-function runCalc() {
-  const id = document.getElementById('calcRecipeSelect').value;
-  const out = document.getElementById('calcOutput');
-  if(!id){out.innerHTML='';return;}
-  const r = DB.recipes[id]; if(!r){out.innerHTML='';return;}
-  const margin = parseFloat(document.getElementById('calcMargin').value)||0;
-  const yieldQty = parseInt(document.getElementById('calcYield').value)||1;
-  const s = DB.settings;
-
-  const iCost = recipeCost(r);
-  const eCost = energyCost(r);
-  const pkgCost = r.packaging?.enabled ? ((r.packaging.cost||0)*yieldQty) : 0;
-  const subtotal = iCost + eCost + pkgCost;
-  const sell = subtotal * (1 + margin/100);
-  const profit = sell - subtotal;
-  const perUnit = sell / yieldQty;
-  const txDeb = sell * (s.txDeb/100);
-  const txCred = sell * (s.txCred/100);
-
-  const ingDetail = (r.ingredients||[]).map(i=>{
-    const c = findCost(i.name,i.qty,i.unit);
-    return `<div class="cost-row"><span class="label">${esc(i.name)} <span class="text-dim">(${fmtQty(i.qty)} ${i.unit})</span></span><span class="val">${c>0?'R$ '+c.toFixed(2):'<span class="text-dim">sem preço</span>'}</span></div>`;
-  }).join('');
-
-  out.innerHTML = `
-    <div class="card mb-16">
-      <div class="card-header"><div class="card-title"><div class="card-title-icon" style="background:var(--success-bg)">📝</div> Ingredientes — ${esc(r.name)}</div></div>
-      ${ingDetail}
-    </div>
-
-    <div class="cost-panel">
-      <div class="card-title mb-16" style="font-size:1rem"><div class="card-title-icon" style="background:var(--accent-glow)">💰</div> Precificação</div>
-      <div class="cost-row"><span class="label">Custo Ingredientes</span><span class="val">R$ ${iCost.toFixed(2)}</span></div>
-      ${eCost>0?`<div class="cost-row"><span class="label">Energia / Gás (${energyLabel(r.energy)})</span><span class="val">R$ ${eCost.toFixed(2)}</span></div>`:''}
-      ${pkgCost>0?`<div class="cost-row"><span class="label">Embalagem (${yieldQty}× R$ ${(r.packaging.cost||0).toFixed(2)})</span><span class="val">R$ ${pkgCost.toFixed(2)}</span></div>`:''}
-      <div class="cost-divider"></div>
-      <div class="cost-row"><span class="label fw-600">Custo Total</span><span class="val fw-700">R$ ${subtotal.toFixed(2)}</span></div>
-      <div class="cost-row"><span class="label">Margem (${margin}%)</span><span class="val text-accent">+ R$ ${profit.toFixed(2)}</span></div>
-      <div class="cost-total cost-row"><span class="label">Preço de Venda</span><span class="val">R$ ${sell.toFixed(2)}</span></div>
-      ${yieldQty>1?`<div class="cost-unit-price">Preço por unidade: <strong>R$ ${perUnit.toFixed(2)}</strong></div>`:''}
-
-      <div class="cost-section-title mt-16">💳 Com Taxa da Maquininha</div>
-      <div class="cost-row"><span class="label">Débito (${s.txDeb}%)</span><span class="val">R$ ${(sell+txDeb).toFixed(2)} <span class="text-xs text-dim">taxa R$ ${txDeb.toFixed(2)}</span></span></div>
-      <div class="cost-row"><span class="label">Crédito (${s.txCred}%)</span><span class="val">R$ ${(sell+txCred).toFixed(2)} <span class="text-xs text-dim">taxa R$ ${txCred.toFixed(2)}</span></span></div>
-      ${yieldQty>1?`
-      <div class="cost-section-title">Por Unidade (com taxa)</div>
-      <div class="cost-row"><span class="label">Un. Débito</span><span class="val">R$ ${((sell+txDeb)/yieldQty).toFixed(2)}</span></div>
-      <div class="cost-row"><span class="label">Un. Crédito</span><span class="val">R$ ${((sell+txCred)/yieldQty).toFixed(2)}</span></div>`:''}
-    </div>
-  `;
-}
-
-// ─── SETTINGS ───
-function loadSettingsUI() {
-  const s = DB.settings;
-  document.getElementById('cfgKwh').value = s.kwh;
-  document.getElementById('cfgOvenW').value = s.ovenW;
-  document.getElementById('cfgGas').value = s.gasPrice;
-  document.getElementById('cfgGasH').value = s.gasH;
-  document.getElementById('cfgTxDeb').value = s.txDeb;
-  document.getElementById('cfgTxCred').value = s.txCred;
-  document.getElementById('cfgMargin').value = s.margin;
-  // Firebase
-  const fbCfg = localStorage.getItem('rp2_fb');
-  if(fbCfg) document.getElementById('cfgFirebase').value = fbCfg;
-}
-
-function saveSettings() {
-  DB.settings = {
-    kwh: parseFloat(document.getElementById('cfgKwh').value)||0.75,
-    ovenW: parseFloat(document.getElementById('cfgOvenW').value)||1500,
-    gasPrice: parseFloat(document.getElementById('cfgGas').value)||110,
-    gasH: parseFloat(document.getElementById('cfgGasH').value)||60,
-    txDeb: parseFloat(document.getElementById('cfgTxDeb').value)||1.99,
-    txCred: parseFloat(document.getElementById('cfgTxCred').value)||3.49,
-    margin: parseFloat(document.getElementById('cfgMargin').value)||200
-  };
-  saveLocal(); syncToCloud();
-}
-
-// ─── IMPORT / EXPORT ───
-function exportAll() {
-  const blob = new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `receitapro_${new Date().toISOString().slice(0,10)}.json`;
-  a.click(); URL.revokeObjectURL(a.href);
-  toast('Backup exportado!');
-}
-function importAll(e) {
-  const file = e.target.files[0]; if(!file)return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const d = JSON.parse(ev.target.result);
-      if(d.recipes) DB.recipes = {...DB.recipes,...d.recipes};
-      if(d.prices) DB.prices = {...DB.prices,...d.prices};
-      if(d.settings) DB.settings = {...defaults(),...d.settings};
-      saveLocal(); syncToCloud(); renderAll(); loadSettingsUI();
-      toast('Dados importados!');
-    } catch{ toast('Arquivo inválido','error'); }
-  };
-  reader.readAsText(file); e.target.value='';
-}
-function clearLocal() {
-  if(!confirm('Limpar dados locais?'))return;
-  localStorage.removeItem('rp2');
-  DB = {recipes:{},prices:{},settings:defaults()};
-  renderAll(); loadSettingsUI(); toast('Dados locais limpos','error');
-}
-
-// ─── UTILS ───
+// ═══ UTILS ═══
 function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
-function renderAll(){ renderRecipes(); renderPrices(); }
+function drawAll(){drawR();drawP();}
 
-// ─── INIT ───
-document.addEventListener('DOMContentLoaded', () => {
-  loadLocal();
-  renderAll();
-  loadSettingsUI();
-  // Auto-connect Firebase if config saved
-  const fbCfg = localStorage.getItem('rp2_fb');
-  if(fbCfg) {
-    try { initFirebase(JSON.parse(fbCfg)); } catch{}
-  }
-});
-
-// Close modal on bg click
-document.getElementById('recipeModal').addEventListener('click', e => {
-  if(e.target === document.getElementById('recipeModal')) closeRecipeModal();
-});
+// ═══ INIT ═══
+document.addEventListener('DOMContentLoaded',()=>{initFB();});
+document.getElementById('rMo').addEventListener('click',e=>{if(e.target===document.getElementById('rMo'))closeMo();});
 </script>
 </body>
 </html>
