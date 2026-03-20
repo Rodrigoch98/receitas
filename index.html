@@ -438,19 +438,31 @@ function findCost(name,qty,unit){
   let best=null,bestScore=0;
   Object.values(D.prices).forEach(p=>{
     const pn=p.name.toLowerCase().trim();
+    const pb=(p.brand||'').toLowerCase().trim();
+    const combined=(pn+' '+pb).trim();
     let score=0;
+    // Exact match name
     if(pn===nl) score=100;
+    // Exact match brand
+    else if(pb&&pb===nl) score=95;
+    // Combined name+brand match
+    else if(combined===nl||nl===combined) score=92;
+    // Name contains search or search contains name
     else if(nl.includes(pn)) score=80;
-    else if(pn.includes(nl)) score=70;
+    else if(pn.includes(nl)) score=75;
+    // Brand contains search or search contains brand
+    else if(pb&&(nl.includes(pb)||pb.includes(nl))) score=70;
+    // Combined contains search
+    else if(nl.includes(pn)||combined.includes(nl)||nl.includes(combined)) score=65;
     else{
-      // Fuzzy: check if most words match
-      const nw=nl.split(/\s+/),pw=pn.split(/\s+/);
+      // Fuzzy: check words across name AND brand
+      const nw=nl.split(/\s+/),pw=(pn+' '+pb).split(/\s+/).filter(Boolean);
       const matches=nw.filter(w=>pw.some(p2=>p2.includes(w)||w.includes(p2))).length;
-      if(matches>0) score=20+(matches/Math.max(nw.length,pw.length))*40;
+      if(matches>0) score=15+(matches/Math.max(nw.length,pw.length))*45;
     }
     if(score>bestScore){bestScore=score;best=p;}
   });
-  if(!best||bestScore<20)return 0;
+  if(!best||bestScore<15)return 0;
   return convertCost(name,qty,unit,best.qty,best.unit,best.price);
 }
 
@@ -465,7 +477,7 @@ function drR(){
   document.getElementById('rC').textContent=arr.length+' receita'+(arr.length!==1?'s':'')+' cadastrada'+(arr.length!==1?'s':'');
   const g=document.getElementById('rG');
   if(!f.length){g.innerHTML=`<div class="EMP" style="grid-column:1/-1"><div class="EMP-i">📖</div><h3>${arr.length?'Nenhum resultado':'Nenhuma receita ainda'}</h3><p>${arr.length?'Tente outra busca':'Toque no + para criar'}</p>${!arr.length?'<button class="B BP" onclick="openM()">+ Nova Receita</button>':''}</div>`;return;}
-  g.innerHTML=f.map(([id,r])=>{const n=(r.ingredients||[]).length,c=rCost(r);return`<div class="RC" onclick="viewR('${id}')"><div class="RC-n">${esc(r.name)}</div>${r.yield?`<div class="RC-y">Rende: ${esc(r.yield)}</div>`:''}<div class="RC-f"><span class="RC-tag">${esc(r.category||'Outros')}</span><span class="RC-st">🧂 ${n}</span>${c>0?`<span class="RC-st ta_ fw6">R$ ${fPrice(c)}</span>`:''}${r.packaging?.enabled?'<span class="RC-st">📦</span>':''}${r.energy&&r.energy!=='nenhum'?'<span class="RC-st">🔥</span>':''}</div></div>`;}).join('');
+  g.innerHTML=f.map(([id,r])=>{const n=(r.ingredients||[]).length,c=rCost(r);return`<div class="RC" onclick="viewR('${id}')"><div class="fx jb ac_"><div style="flex:1;min-width:0"><div class="RC-n">${esc(r.name)}</div>${r.yield?`<div class="RC-y">Rende: ${esc(r.yield)}</div>`:''}</div><button class="Bic" onclick="event.stopPropagation();openM('${id}')" title="Editar" style="flex-shrink:0">✏️</button></div><div class="RC-f"><span class="RC-tag">${esc(r.category||'Outros')}</span><span class="RC-st">🧂 ${n}</span>${c>0?`<span class="RC-st ta_ fw6">R$ ${fPrice(c)}</span>`:''}${r.packaging?.enabled?'<span class="RC-st">📦</span>':''}${r.energy&&r.energy!=='nenhum'?'<span class="RC-st">🔥</span>':''}</div></div>`;}).join('');
 }
 
 // ═══ VIEW RECIPE ═══
@@ -478,7 +490,7 @@ function viewR(id){
   const eL={forno_eletrico:'Forno Elétrico',forno_gas:'Forno a Gás',fogao:'Fogão',forno_eletrico_fogao:'Forno + Fogão',forno_gas_fogao:'Forno Gás + Fogão'};
   const iH=(r.ingredients||[]).map(i=>{const c=findCost(i.name,i.qty,i.unit),cv=convLabels(i.qty,i.unit);return`<tr><td><strong>${esc(i.name)}</strong></td><td>${fq(i.qty)} ${esc(i.unit)}</td><td class="tsm tm_">${cv.join(' · ')||'—'}</td><td class="${c>0?'ta_ fw6':'tm_'}">${c>0?'R$ '+fPrice(c):'—'}</td></tr>`;}).join('');
   const sH=(r.instructions||'').split('\n').filter(s=>s.trim()).map((s,i)=>`<div class="ST"><div class="ST-n">${i+1}</div><div class="ST-t">${esc(s.trim())}</div></div>`).join('');
-  v.innerHTML=`<div class="fx jb ac_ fw g8 mb20"><button class="B BG Bsm" onclick="closeDet()">← Voltar</button><div class="fx g6"><button class="B BS Bsm" onclick="openM('${id}')">✏️ Editar</button><button class="B BD Bsm" onclick="delR('${id}')">🗑️</button></div></div>
+  v.innerHTML=`<div class="fx jb ac_ fw g8 mb20"><button class="B BG Bsm" onclick="closeDet()">← Voltar</button><div class="fx g8"><button class="B BP Bsm" onclick="openM('${id}')" style="min-width:100px">✏️ Editar</button><button class="B BD Bsm" onclick="delR('${id}')">🗑️ Excluir</button></div></div>
     <div class="RH"><div class="RH-n">${esc(r.name)}</div>${r.yield?`<div class="RH-s">📊 Rendimento: ${esc(r.yield)}</div>`:''}<div class="fx g8 fw mt12"><span class="BDG" style="background:var(--ac-lt);color:var(--ac-tx)">${esc(r.category||'Outros')}</span>${r.energy&&r.energy!=='nenhum'?`<span class="BDG" style="background:var(--blu-bg);color:var(--blu)">🔥 ${eL[r.energy]||r.energy}</span>`:''}${r.packaging?.enabled?`<span class="BDG" style="background:var(--grn-bg);color:var(--grn)">📦 ${esc(r.packaging.desc||'Embalagem')}</span>`:''}</div></div>
     <div class="C mb12"><div class="C-h"><div class="C-t"><div class="C-ic" style="background:var(--grn-bg)">🧂</div>Ingredientes</div></div><div style="overflow-x:auto"><table class="IT"><thead><tr><th>Ingrediente</th><th>Qtd</th><th>Conversões</th><th>Custo</th></tr></thead><tbody>${iH}</tbody></table></div></div>
     ${sH?`<div class="C mb12"><div class="C-h"><div class="C-t"><div class="C-ic" style="background:var(--ac-lt)">👩‍🍳</div>Modo de Preparo</div></div>${sH}</div>`:''}
@@ -519,9 +531,13 @@ function filterAC(inp){
   const row=inp.closest('.IR');const list=row.querySelector('.AC-list');
   const prods=Object.values(D.prices);
   if(!v||prods.length===0){list.classList.remove('vis');return;}
-  const matches=prods.filter(p=>p.name.toLowerCase().includes(v)||v.includes(p.name.toLowerCase())).slice(0,8);
+  const matches=prods.filter(p=>{
+    const pn=p.name.toLowerCase();
+    const pb=(p.brand||'').toLowerCase();
+    return pn.includes(v)||v.includes(pn)||pb.includes(v)||v.includes(pb)||(pn+' '+pb).includes(v);
+  }).slice(0,8);
   if(!matches.length){list.classList.remove('vis');return;}
-  list.innerHTML=matches.map(p=>`<div class="AC-item" onmousedown="pickAC(this,'${esc(p.name)}')">${esc(p.name)}${p.brand?` <span class="txs tm_">${esc(p.brand)}</span>`:''}<span class="AC-u">${p.qty} ${p.unit}</span></div>`).join('');
+  list.innerHTML=matches.map(p=>`<div class="AC-item" onmousedown="pickAC(this,'${esc(p.name)}')">${esc(p.name)}${p.brand?` <span class="txs tm_">(${esc(p.brand)})</span>`:''}<span class="AC-u">${p.qty} ${p.unit}</span></div>`).join('');
   list.classList.add('vis');
 }
 function hideAC(inp){const list=inp.closest('.IR').querySelector('.AC-list');list.classList.remove('vis');}
