@@ -96,6 +96,22 @@ button,input,select,textarea{font-family:var(--fb)}
 .F-s{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239C8E7E' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
 .F-s option{background:var(--white)}
 .RW{display:grid;gap:10px}.RW2{grid-template-columns:1fr 1fr}.RW3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:480px){
+  .RW2,.RW3{grid-template-columns:1fr}
+  .pg-t{font-size:1.45rem}
+  .RH-n{font-size:1.35rem}
+  .C{padding:16px}
+  .H-sync{display:none}
+  .H-t{font-size:1.15rem}
+  .IT{font-size:.82rem}
+  .IT th{font-size:.6rem;padding:6px 6px}
+  .IT td{padding:8px 6px;font-size:.82rem}
+  .CP{padding:16px}
+  .CP-tot .v{font-size:1.3rem}
+  .MO{padding:18px 14px}
+  .PR{flex-wrap:wrap;gap:8px}
+  .PR-d{min-width:auto}
+}
 
 /* Toggle */
 .TG-w{display:flex;align-items:center;gap:11px;padding:3px 0}
@@ -180,9 +196,15 @@ button,input,select,textarea{font-family:var(--fb)}
 .CP-sec{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-l);margin:12px 0 5px}
 
 /* ═══ ING FORM ROW ═══ */
-.IR{display:grid;grid-template-columns:1fr 72px 94px 30px;gap:5px;align-items:start;margin-bottom:5px}
+.IR{display:grid;grid-template-columns:1fr 72px 94px 30px;gap:5px;align-items:start;margin-bottom:6px}
 .IR .F-i,.IR .F-s{padding:10px 11px;font-size:.88rem}
-@media(max-width:480px){.IR{grid-template-columns:1fr 1fr 30px}.IR>:first-child{grid-column:1/-1}}
+@media(max-width:520px){
+  .IR{grid-template-columns:1fr 30px}
+  .IR>:first-child{grid-column:1/2}
+  .IR>:nth-child(2){grid-column:1/2}
+  .IR>:nth-child(3){grid-column:1/2}
+  .IR>:last-child{grid-row:1;grid-column:2}
+}
 
 /* ═══ PRICE ROW ═══ */
 .PR{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-lt)}
@@ -338,6 +360,16 @@ button,input,select,textarea{font-family:var(--fb)}
     <div class="TG-w mb12"><div class="TG" id="fPT" onclick="this.classList.toggle('on');togPk()"></div><span class="TG-t">Incluir embalagem</span></div>
     <div id="pkF" class="dn"><div class="RW RW2"><div class="F"><label class="F-l">Custo/un (R$)</label><input class="F-i" type="number" step="0.01" min="0" id="fPC" placeholder="1,50"></div><div class="F"><label class="F-l">Descrição</label><input class="F-i" id="fPD" placeholder="Ex: Caixa kraft"></div></div></div>
   </div>
+  <div class="C mb12"><div class="C-h"><div class="C-t"><div class="C-ic" style="background:var(--blu-bg)">🧑‍🍳</div>Mão de Obra</div></div>
+    <p class="tsm tm_ mb8">Valor fixo pelo seu trabalho nesta receita. Não sofre acréscimo da margem de lucro — é somado diretamente ao preço final.</p>
+    <div class="TG-w mb12"><div class="TG" id="fLT" onclick="this.classList.toggle('on');togLb()"></div><span class="TG-t">Incluir mão de obra</span></div>
+    <div id="lbF" class="dn"><div class="RW RW2"><div class="F"><label class="F-l">Valor (R$)</label><input class="F-i" type="number" step="0.01" min="0" id="fLC" placeholder="30,00"></div><div class="F"><label class="F-l">Tempo estimado</label><input class="F-i" id="fLD" placeholder="Ex: 2 horas"></div></div></div>
+  </div>
+  <div class="C mb12"><div class="C-h"><div class="C-t"><div class="C-ic" style="background:var(--grn-bg)">🧹</div>Limpeza e Água</div></div>
+    <p class="tsm tm_ mb8">Custo com produtos de limpeza e água para lavar utensílios desta receita. Também não sofre acréscimo da margem.</p>
+    <div class="TG-w mb12"><div class="TG" id="fCLT" onclick="this.classList.toggle('on');togCl()"></div><span class="TG-t">Incluir limpeza e água</span></div>
+    <div id="clF" class="dn"><div class="RW RW2"><div class="F"><label class="F-l">Custo (R$)</label><input class="F-i" type="number" step="0.01" min="0" id="fCLC" placeholder="5,00"></div><div class="F"><label class="F-l">Observação</label><input class="F-i" id="fCLD" placeholder="Ex: Detergente, esponja, água"></div></div></div>
+  </div>
   <div class="C mb20"><div class="C-h"><div class="C-t"><div class="C-ic" style="background:var(--bg-warm)">📋</div>Observações</div></div>
     <div class="F"><textarea class="F-ta" id="fNt" rows="2" placeholder="Dicas, variações..."></textarea></div>
   </div>
@@ -477,7 +509,7 @@ function drR(){
   document.getElementById('rC').textContent=arr.length+' receita'+(arr.length!==1?'s':'')+' cadastrada'+(arr.length!==1?'s':'');
   const g=document.getElementById('rG');
   if(!f.length){g.innerHTML=`<div class="EMP" style="grid-column:1/-1"><div class="EMP-i">📖</div><h3>${arr.length?'Nenhum resultado':'Nenhuma receita ainda'}</h3><p>${arr.length?'Tente outra busca':'Toque no + para criar'}</p>${!arr.length?'<button class="B BP" onclick="openM()">+ Nova Receita</button>':''}</div>`;return;}
-  g.innerHTML=f.map(([id,r])=>{const n=(r.ingredients||[]).length,c=rCost(r);return`<div class="RC" onclick="viewR('${id}')"><div class="fx jb ac_"><div style="flex:1;min-width:0"><div class="RC-n">${esc(r.name)}</div>${r.yield?`<div class="RC-y">Rende: ${esc(r.yield)}</div>`:''}</div><button class="Bic" onclick="event.stopPropagation();openM('${id}')" title="Editar" style="flex-shrink:0">✏️</button></div><div class="RC-f"><span class="RC-tag">${esc(r.category||'Outros')}</span><span class="RC-st">🧂 ${n}</span>${c>0?`<span class="RC-st ta_ fw6">R$ ${fPrice(c)}</span>`:''}${r.packaging?.enabled?'<span class="RC-st">📦</span>':''}${r.energy&&r.energy!=='nenhum'?'<span class="RC-st">🔥</span>':''}</div></div>`;}).join('');
+  g.innerHTML=f.map(([id,r])=>{const n=(r.ingredients||[]).length,c=rCost(r);return`<div class="RC" onclick="viewR('${id}')"><div class="fx jb ac_"><div style="flex:1;min-width:0"><div class="RC-n">${esc(r.name)}</div>${r.yield?`<div class="RC-y">Rende: ${esc(r.yield)}</div>`:''}</div><button class="Bic" onclick="event.stopPropagation();openM('${id}')" title="Editar" style="flex-shrink:0">✏️</button></div><div class="RC-f"><span class="RC-tag">${esc(r.category||'Outros')}</span><span class="RC-st">🧂 ${n}</span>${c>0?`<span class="RC-st ta_ fw6">R$ ${fPrice(c)}</span>`:''}${r.packaging?.enabled?'<span class="RC-st">📦</span>':''}${r.labor?.enabled?'<span class="RC-st">🧑‍🍳</span>':''}${r.cleaning?.enabled?'<span class="RC-st">🧹</span>':''}${r.energy&&r.energy!=='nenhum'?'<span class="RC-st">🔥</span>':''}</div></div>`;}).join('');
 }
 
 // ═══ VIEW RECIPE ═══
@@ -486,12 +518,15 @@ function viewR(id){
   document.getElementById('vL').classList.add('dn');document.getElementById('fab').classList.add('dn');
   const v=document.getElementById('vD');v.classList.remove('dn');
   const ic=rCost(r),ec=eCost(r),pk=r.packaging?.enabled?(r.packaging.cost||0):0;
-  let yn=parseInt((r.yield||'').match(/\d+/)?.[0])||1;const total=ic+ec+(pk*yn);
+  const lb=r.labor?.enabled?(r.labor.cost||0):0;
+  const cl=r.cleaning?.enabled?(r.cleaning.cost||0):0;
+  let yn=parseInt((r.yield||'').match(/\d+/)?.[0])||1;
+  const total=ic+ec+(pk*yn)+lb+cl;
   const eL={forno_eletrico:'Forno Elétrico',forno_gas:'Forno a Gás',fogao:'Fogão',forno_eletrico_fogao:'Forno + Fogão',forno_gas_fogao:'Forno Gás + Fogão'};
   const iH=(r.ingredients||[]).map(i=>{const c=findCost(i.name,i.qty,i.unit),cv=convLabels(i.qty,i.unit);return`<tr><td><strong>${esc(i.name)}</strong></td><td>${fq(i.qty)} ${esc(i.unit)}</td><td class="tsm tm_">${cv.join(' · ')||'—'}</td><td class="${c>0?'ta_ fw6':'tm_'}">${c>0?'R$ '+fPrice(c):'—'}</td></tr>`;}).join('');
   const sH=(r.instructions||'').split('\n').filter(s=>s.trim()).map((s,i)=>`<div class="ST"><div class="ST-n">${i+1}</div><div class="ST-t">${esc(s.trim())}</div></div>`).join('');
   v.innerHTML=`<div class="fx jb ac_ fw g8 mb20"><button class="B BG Bsm" onclick="closeDet()">← Voltar</button><div class="fx g8"><button class="B BP Bsm" onclick="openM('${id}')" style="min-width:100px">✏️ Editar</button><button class="B BD Bsm" onclick="delR('${id}')">🗑️ Excluir</button></div></div>
-    <div class="RH"><div class="RH-n">${esc(r.name)}</div>${r.yield?`<div class="RH-s">📊 Rendimento: ${esc(r.yield)}</div>`:''}<div class="fx g8 fw mt12"><span class="BDG" style="background:var(--ac-lt);color:var(--ac-tx)">${esc(r.category||'Outros')}</span>${r.energy&&r.energy!=='nenhum'?`<span class="BDG" style="background:var(--blu-bg);color:var(--blu)">🔥 ${eL[r.energy]||r.energy}</span>`:''}${r.packaging?.enabled?`<span class="BDG" style="background:var(--grn-bg);color:var(--grn)">📦 ${esc(r.packaging.desc||'Embalagem')}</span>`:''}</div></div>
+    <div class="RH"><div class="RH-n">${esc(r.name)}</div>${r.yield?`<div class="RH-s">📊 Rendimento: ${esc(r.yield)}</div>`:''}<div class="fx g8 fw mt12"><span class="BDG" style="background:var(--ac-lt);color:var(--ac-tx)">${esc(r.category||'Outros')}</span>${r.energy&&r.energy!=='nenhum'?`<span class="BDG" style="background:var(--blu-bg);color:var(--blu)">🔥 ${eL[r.energy]||r.energy}</span>`:''}${r.packaging?.enabled?`<span class="BDG" style="background:var(--grn-bg);color:var(--grn)">📦 ${esc(r.packaging.desc||'Embalagem')}</span>`:''}${r.labor?.enabled?`<span class="BDG" style="background:var(--blu-bg);color:var(--blu)">🧑‍🍳 Mão de obra</span>`:''}${r.cleaning?.enabled?`<span class="BDG" style="background:var(--grn-bg);color:var(--grn)">🧹 Limpeza</span>`:''}</div></div>
     <div class="C mb12"><div class="C-h"><div class="C-t"><div class="C-ic" style="background:var(--grn-bg)">🧂</div>Ingredientes</div></div><div style="overflow-x:auto"><table class="IT"><thead><tr><th>Ingrediente</th><th>Qtd</th><th>Conversões</th><th>Custo</th></tr></thead><tbody>${iH}</tbody></table></div></div>
     ${sH?`<div class="C mb12"><div class="C-h"><div class="C-t"><div class="C-ic" style="background:var(--ac-lt)">👩‍🍳</div>Modo de Preparo</div></div>${sH}</div>`:''}
     ${r.notes?`<div class="C mb12"><div class="C-h"><div class="C-t"><div class="C-ic" style="background:var(--bg-warm)">📋</div>Observações</div></div><p class="tsm" style="line-height:1.8;color:var(--text-2)">${esc(r.notes).replace(/\n/g,'<br>')}</p></div>`:''}
@@ -499,6 +534,8 @@ function viewR(id){
       <div class="CP-r"><span class="l">Ingredientes</span><span class="v">R$ ${fPrice(ic)}</span></div>
       ${ec>0?`<div class="CP-r"><span class="l">Energia / Gás</span><span class="v">R$ ${fPrice(ec)}</span></div>`:''}
       ${r.packaging?.enabled?`<div class="CP-r"><span class="l">Embalagem (${yn}× R$ ${fPrice(pk)})</span><span class="v">R$ ${fPrice(pk*yn)}</span></div>`:''}
+      ${lb>0?`<div class="CP-r"><span class="l">Mão de Obra${r.labor.desc?' ('+esc(r.labor.desc)+')':''}</span><span class="v">R$ ${fPrice(lb)}</span></div>`:''}
+      ${cl>0?`<div class="CP-r"><span class="l">Limpeza / Água${r.cleaning.desc?' ('+esc(r.cleaning.desc)+')':''}</span><span class="v">R$ ${fPrice(cl)}</span></div>`:''}
       <div class="CP-tot CP-r"><span class="l">Custo Total</span><span class="v">R$ ${fPrice(total)}</span></div>
       ${yn>1?`<div class="CP-u">Por unidade: <strong>R$ ${fPrice(total/yn)}</strong></div>`:''}
     </div>`;
@@ -511,8 +548,11 @@ function openM(id=null){
   editId=id;document.getElementById('rMo').classList.add('on');
   document.getElementById('moT').textContent=id?'Editar Receita':'Nova Receita';
   if(id){const r=D.recipes[id];document.getElementById('fN').value=r.name||'';document.getElementById('fY').value=r.yield||'';document.getElementById('fC').value=r.category||'Doces';document.getElementById('fIn').value=r.instructions||'';document.getElementById('fEn').value=r.energy||'nenhum';document.getElementById('fOT').value=r.ovenTime||0;document.getElementById('fST').value=r.stoveTime||0;document.getElementById('fNt').value=r.notes||'';
-    const pk=r.packaging||{};document.getElementById('fPT').classList.toggle('on',!!pk.enabled);document.getElementById('fPC').value=pk.cost||'';document.getElementById('fPD').value=pk.desc||'';togPk();togEn();drIR(r.ingredients||[{name:'',qty:'',unit:'g'}]);
-  }else{['fN','fY','fIn','fNt','fQI','fPC','fPD'].forEach(x=>document.getElementById(x).value='');document.getElementById('fC').value='Doces';document.getElementById('fEn').value='nenhum';document.getElementById('fOT').value=0;document.getElementById('fST').value=0;document.getElementById('fPT').classList.remove('on');togPk();togEn();drIR([{name:'',qty:'',unit:'g'}]);}
+    const pk=r.packaging||{};document.getElementById('fPT').classList.toggle('on',!!pk.enabled);document.getElementById('fPC').value=pk.cost||'';document.getElementById('fPD').value=pk.desc||'';
+    const lb=r.labor||{};document.getElementById('fLT').classList.toggle('on',!!lb.enabled);document.getElementById('fLC').value=lb.cost||'';document.getElementById('fLD').value=lb.desc||'';
+    const cl=r.cleaning||{};document.getElementById('fCLT').classList.toggle('on',!!cl.enabled);document.getElementById('fCLC').value=cl.cost||'';document.getElementById('fCLD').value=cl.desc||'';
+    togPk();togEn();togLb();togCl();drIR(r.ingredients||[{name:'',qty:'',unit:'g'}]);
+  }else{['fN','fY','fIn','fNt','fQI','fPC','fPD','fLC','fLD','fCLC','fCLD'].forEach(x=>document.getElementById(x).value='');document.getElementById('fC').value='Doces';document.getElementById('fEn').value='nenhum';document.getElementById('fOT').value=0;document.getElementById('fST').value=0;document.getElementById('fPT').classList.remove('on');document.getElementById('fLT').classList.remove('on');document.getElementById('fCLT').classList.remove('on');togPk();togEn();togLb();togCl();drIR([{name:'',qty:'',unit:'g'}]);}
   document.getElementById('rMoS').scrollTop=0;
 }
 function closeM(){document.getElementById('rMo').classList.remove('on');editId=null;}
@@ -601,11 +641,17 @@ function pickAC(el,priceId){
 function getIngs(){const out=[];document.querySelectorAll('#iRs .IR').forEach(r=>{const n=r.querySelector('[data-f="n"]').value.trim(),q=parseFloat(r.querySelector('[data-f="q"]').value)||0,u=r.querySelector('[data-f="u"]').value;if(n)out.push({name:n,qty:q,unit:u});});return out;}
 function togEn(){const v=document.getElementById('fEn').value;document.getElementById('enF').classList.toggle('dn',v==='nenhum');document.getElementById('wOT').classList.toggle('dn',!v.includes('forno'));document.getElementById('wST').classList.toggle('dn',!v.includes('fogao'));}
 function togPk(){document.getElementById('pkF').classList.toggle('dn',!document.getElementById('fPT').classList.contains('on'));}
+function togLb(){document.getElementById('lbF').classList.toggle('dn',!document.getElementById('fLT').classList.contains('on'));}
+function togCl(){document.getElementById('clF').classList.toggle('dn',!document.getElementById('fCLT').classList.contains('on'));}
 
 function saveR(){
   const name=document.getElementById('fN').value.trim();if(!name){tst('Informe o nome','err');return;}
   const id=editId||'r_'+Date.now(),ex=D.recipes[id]||{};
-  D.recipes[id]={name,yield:document.getElementById('fY').value.trim(),category:document.getElementById('fC').value,ingredients:getIngs(),instructions:document.getElementById('fIn').value.trim(),energy:document.getElementById('fEn').value,ovenTime:parseInt(document.getElementById('fOT').value)||0,stoveTime:parseInt(document.getElementById('fST').value)||0,packaging:{enabled:document.getElementById('fPT').classList.contains('on'),cost:parseFloat(document.getElementById('fPC').value)||0,desc:document.getElementById('fPD').value.trim()},notes:document.getElementById('fNt').value.trim(),createdAt:ex.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+  D.recipes[id]={name,yield:document.getElementById('fY').value.trim(),category:document.getElementById('fC').value,ingredients:getIngs(),instructions:document.getElementById('fIn').value.trim(),energy:document.getElementById('fEn').value,ovenTime:parseInt(document.getElementById('fOT').value)||0,stoveTime:parseInt(document.getElementById('fST').value)||0,
+    packaging:{enabled:document.getElementById('fPT').classList.contains('on'),cost:parseFloat(document.getElementById('fPC').value)||0,desc:document.getElementById('fPD').value.trim()},
+    labor:{enabled:document.getElementById('fLT').classList.contains('on'),cost:parseFloat(document.getElementById('fLC').value)||0,desc:document.getElementById('fLD').value.trim()},
+    cleaning:{enabled:document.getElementById('fCLT').classList.contains('on'),cost:parseFloat(document.getElementById('fCLC').value)||0,desc:document.getElementById('fCLD').value.trim()},
+    notes:document.getElementById('fNt').value.trim(),createdAt:ex.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
   push();closeM();if(viewId===id)viewR(id);else drR();tst(editId?'Atualizada!':'Salva!');
 }
 
@@ -709,15 +755,18 @@ function calc(){
   const yn=parseInt(document.getElementById('cY').value)||1;
   const s=D.settings;
   const ic=rCost(r),ec=eCost(r),pk=r.packaging?.enabled?((r.packaging.cost||0)*yn):0;
-  const subtotal=ic+ec+pk;
+  const lb=r.labor?.enabled?(r.labor.cost||0):0;
+  const cl=r.cleaning?.enabled?(r.cleaning.cost||0):0;
 
-  // Selling = cost × (1 + margin/100). Machine NOT included in margin.
-  const sellTotal=subtotal*(1+mar/100);
+  // Costs that receive margin markup
+  const costBase=ic+ec+pk;
+  // Selling = costBase × (1 + margin/100) + labor + cleaning (flat, no margin)
+  const withMargin=costBase*(1+mar/100);
+  const sellTotal=withMargin+lb+cl;
   const unitPrice=sellTotal/yn;
-  const profit=sellTotal-subtotal;
+  const profit=sellTotal-costBase-lb-cl;
 
   const useMaq=document.getElementById('cMq').classList.contains('on');
-  // Machine fees applied AFTER selling price
   const tdRate=s.txDeb/100, tcRate=s.txCred/100;
   const unitDeb=unitPrice*(1+tdRate);
   const unitCred=unitPrice*(1+tcRate);
@@ -733,8 +782,10 @@ function calc(){
       ${ec>0?`<div class="CP-r"><span class="l">Energia / Gás</span><span class="v">R$ ${fPrice(ec)}</span></div>`:''}
       ${pk>0?`<div class="CP-r"><span class="l">Embalagem (${yn}× R$ ${fPrice(r.packaging.cost||0)})</span><span class="v">R$ ${fPrice(pk)}</span></div>`:''}
       <div class="CP-d"></div>
-      <div class="CP-r"><span class="l fw6">Custo Total</span><span class="v fw7">R$ ${fPrice(subtotal)}</span></div>
+      <div class="CP-r"><span class="l fw6">Custo Base</span><span class="v fw7">R$ ${fPrice(costBase)}</span></div>
       <div class="CP-r"><span class="l">Margem (${mar}%)</span><span class="v ta_">+ R$ ${fPrice(profit)}</span></div>
+      ${lb>0?`<div class="CP-r"><span class="l">Mão de Obra <span class="txs tm_">(valor fixo)</span></span><span class="v">+ R$ ${fPrice(lb)}</span></div>`:''}
+      ${cl>0?`<div class="CP-r"><span class="l">Limpeza / Água <span class="txs tm_">(valor fixo)</span></span><span class="v">+ R$ ${fPrice(cl)}</span></div>`:''}
       <div class="CP-d"></div>
       <div class="CP-tot CP-r"><span class="l">Preço de Venda</span><span class="v">R$ ${fPrice(sellTotal)}</span></div>
       ${yn>1?`<div class="CP-u">Preço unitário: <strong>R$ ${fPrice(unitPrice)}</strong></div>`:''}
